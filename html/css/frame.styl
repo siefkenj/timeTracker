@@ -37,7 +37,19 @@ body
 
 #header
 	background: gray
+	display: flex
+	flex-direction: row
+	flex-wrap: nowrap
+	align-items: baseline
+
+	.middle
+		flex-grow: 1
+		text-align: center
 #content
+	flex-grow: 1
 	background: white
 #footer
 	background: gray
+	.middle
+		flex-grow: 1
+		text-align: center

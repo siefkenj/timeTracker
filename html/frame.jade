@@ -3,6 +3,11 @@ html(lang="en")
 	head
 		title='Time Tracker'
 		
-		link(href="css/frame.html" rel="stylesheet")
+		link(href="css/frame.css" rel="stylesheet")
 	body
-		block content
+		div(id="header")
+			| header
+		div(id="content")
+			block content
+		div(id="footer")
+			| footer

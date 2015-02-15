@@ -1,2 +1,2 @@
 # timeTracker
-Web app to track time spent with people
+Web app to track time spent with people!

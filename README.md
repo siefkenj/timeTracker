@@ -3,7 +3,7 @@ Web app to track time spent with people!
 
 ##API Design
 
-```JSON
+```javascript
 { 
   <date>:{
     <personID>:{

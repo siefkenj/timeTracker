@@ -1,0 +1,78 @@
+//
+//	Sylus file to be compiled to CSS with
+//
+//	`stylus frame.styl -u nib`
+//
+//      To watch a file for changes
+//	`stylus -w frame.styl -u nib`
+//
+//	Install stylus with `npm install stylus -g`
+//	Install nib with    `npm install nib -g` (for css3 comaptability extensions)
+//
+
+@import 'nib'
+
+.calendar-view
+    width:100%
+    height:100%
+    flex-grow:1
+
+#month
+    background:orange
+    text-align:center
+    padding:0px
+    margin:0px
+
+.container
+    display:flex
+    flex-direction:column
+    height:100%
+
+td
+    border:1px solid black
+    text-align:right
+    vertical-align:text-top
+
+/*rowHeight=25px
+
+#container
+	display: flex
+	flex-direction: column
+	flex-wrap: nowrap
+
+.hourScroller, .hourScrollerHeader
+	display: flex
+	flex-direction: row
+.hourScroller
+	flex-grow: 1
+	overflow: auto
+.hourScrollerHeader
+	.name
+		flex-grow: 1
+		text-align: center
+
+.column 
+	&.hours
+		text-align: right
+		margin-right: 4px
+		width: 3em
+		box-sizing: border-box
+	&.hoursGrid
+		flex-grow: 1
+		position: relative
+		background: yellow
+		.time
+			border-top: 2px solid black
+		.hourSpan
+			box-sizing: border-box
+			position: absolute
+			background: rgba(0, 128, 15, 0.75)
+			left: 1em
+			top: rowHeight*1.5
+			height: rowHeight*6
+			padding: 4px
+			border-radius: 8px
+	.time
+		box-sizing: border-box
+		height: rowHeight
+*/

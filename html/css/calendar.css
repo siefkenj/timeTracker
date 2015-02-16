@@ -30,7 +30,7 @@
   flex-direction: column;
   height: 100%;
 }
-td {
+.day {
   border: 1px solid #000;
   text-align: right;
   vertical-align: text-top;

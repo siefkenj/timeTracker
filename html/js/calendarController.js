@@ -5,14 +5,25 @@ app = angular.module('App', []);
 
 app.controller('Calendar', [
   '$scope', function($scope) {
-    var displayMonth, firstDay, locale, now, year;
+    var displayMonth, elm, firstDay, index, locale, month, now, numDays, year, _i, _len, _ref;
     locale = 'en-us';
     now = new Date();
     year = now.getFullYear();
-    $scope.month = now.toLocaleDateString(locale, {
+    month = now.getMonth() + 4;
+    displayMonth = new Date(year, month, 1);
+    $scope.month = displayMonth.toLocaleDateString(locale, {
       month: 'long'
     });
-    displayMonth = new Date(year, month, 1);
     firstDay = displayMonth.getDay();
+    numDays = (new Date(year, month + 1, 0)).getDate();
+    _ref = document.querySelectorAll('.day');
+    for (index = _i = 0, _len = _ref.length; _i < _len; index = ++_i) {
+      elm = _ref[index];
+      if (index < firstDay || index > numDays) {
+        elm.innerHTML = '';
+      } else {
+        elm.innerHTML = index - firstDay + 1;
+      }
+    }
   }
 ]);

@@ -10,15 +10,12 @@ block controller
 
 block content
     - var i = 1;
+    - var j = 0;
     div(class='container', ng-controller='Calendar') 
         h1(id="month")= "{{ month }}"
         table(class='calendar-view') 
             each thing in ['week1', 'week2', 'week3', 'week4', 'week5']
                 tr(id=thing)
-                    td= i++
-                    td= i++
-                    td= i++
-                    td= i++
-                    td= i++
-                    td= i++
-                    td= i++
+                    while (i) % 7 != 0
+                        td(class = 'day')= i++
+                    td(class='day')= i++

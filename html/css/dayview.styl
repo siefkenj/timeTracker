@@ -51,6 +51,23 @@ rowHeight=25px
 			//height: rowHeight*6
 			padding: 4px
 			border-radius: 8px
+			padding-top: 1em
+			padding-bottom: 1em
+			transition: top .3s, height .3s
+			width: 80%
+
+			.top-handle,.bottom-handle
+				position: absolute
+				width: 80%
+				background: lightgreen
+			.top-handle
+				top: 0px
+			.bottom-handle
+				bottom: 0px
+
+			.top-handle:hover,.bottom-handle:hover
+				background: lightskyblue
+			
 
 		for num in (1..24)
 			for half in 0 5

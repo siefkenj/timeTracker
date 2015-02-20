@@ -3,7 +3,7 @@
 /*
  * Helper Functions
  */
-var END_TIME, START_TIME, app, createHourList, getTotalHours, roundToHalf, timeRangeToClassName, timeviewController,
+var END_TIME, START_TIME, adjustableRangeDirective, app, createHourList, getTotalHours, roundToHalf, timeRangeToClassName, timeviewController,
   modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
 
 roundToHalf = function(t) {
@@ -120,7 +120,62 @@ timeviewController = function($scope) {
     }
     return results;
   })();
-  return console.log($scope.names, $scope.people);
+  console.log($scope.names, $scope.people);
+};
+
+adjustableRangeDirective = function() {
+  return {
+    link: function(scope, elm, attrs) {
+      var oldHourChange, origTimeEnd, origTimeStart, startY;
+      oldHourChange = null;
+      startY = null;
+      origTimeStart = scope.time.start;
+      origTimeEnd = scope.time.end;
+      interact($(elm).find('.top-handle')[0]).draggable({
+        max: Infinity
+      }).on('dragstart', function(evt) {
+        startY = evt.pageY;
+        return origTimeStart = scope.time.start;
+      }).on('dragmove', function(evt) {
+        var delta, hourChange;
+        delta = startY - evt.pageY;
+        hourChange = roundToHalf(delta / 23);
+        if (hourChange !== oldHourChange) {
+          oldHourChange = hourChange;
+          scope.time.start = origTimeStart - hourChange;
+          return scope.$apply();
+        }
+      });
+      return interact($(elm).find('.bottom-handle')[0]).draggable({
+        max: Infinity
+      }).on('dragstart', function(evt) {
+        startY = evt.pageY;
+        return origTimeEnd = scope.time.end;
+      }).on('dragmove', function(evt) {
+        var delta, hourChange;
+        delta = startY - evt.pageY;
+        hourChange = roundToHalf(delta / 23);
+        if (hourChange !== oldHourChange) {
+          oldHourChange = hourChange;
+          scope.time.end = origTimeEnd - hourChange;
+          return scope.$apply();
+        }
+      });
+
+      /*
+      $(elm).find('.top-handle').click (evt, elm) ->
+          console.log evt, elm
+          scope.time.start -= .5
+          scope.$apply()
+      $(elm).find('.bottom-handle').click (evt, elm) ->
+          console.log evt, elm
+          scope.time.end += .5
+          scope.$apply()
+       */
+    }
+  };
 };
 
 app.controller('TimeViewController', ['$scope', timeviewController]);
+
+app.directive('adjustableRange', adjustableRangeDirective);

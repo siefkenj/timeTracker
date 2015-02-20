@@ -85,6 +85,30 @@
   padding: 4px;
   -webkit-border-radius: 8px;
   border-radius: 8px;
+  padding-top: 1em;
+  padding-bottom: 1em;
+  -webkit-transition: top 0.3s, height 0.3s;
+  -moz-transition: top 0.3s, height 0.3s;
+  -o-transition: top 0.3s, height 0.3s;
+  -ms-transition: top 0.3s, height 0.3s;
+  transition: top 0.3s, height 0.3s;
+  width: 80%;
+}
+.column.hoursGrid .hourSpan .top-handle,
+.column.hoursGrid .hourSpan .bottom-handle {
+  position: absolute;
+  width: 80%;
+  background: #90ee90;
+}
+.column.hoursGrid .hourSpan .top-handle {
+  top: 0px;
+}
+.column.hoursGrid .hourSpan .bottom-handle {
+  bottom: 0px;
+}
+.column.hoursGrid .hourSpan .top-handle:hover,
+.column.hoursGrid .hourSpan .bottom-handle:hover {
+  background: #87cefa;
 }
 .column.hoursGrid .hourSpan.length-1-0 {
   height: 25px;

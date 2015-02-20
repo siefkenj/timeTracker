@@ -36,6 +36,7 @@ timeRangeToClassName = (t) ->
 START_TIME = -2
 END_TIME = 24 + 3
 
+
 ###
 # START OF THE APP
 ###
@@ -59,8 +60,56 @@ timeviewController = ($scope) ->
     $scope.hours = createHourList(START_TIME, END_TIME)
     $scope.names = ("#{v.name} (#{getTotalHours(v)})" for k,v of $scope.people)
     console.log $scope.names,$scope.people
+    return
     #$scope.hours = ["abc", "123"]
+adjustableRangeDirective = () ->
+    return {
+        link: (scope, elm, attrs) ->
+            oldHourChange = null
+            startY = null
+            origTimeStart = scope.time.start
+            origTimeEnd = scope.time.end
+            interact($(elm).find('.top-handle')[0]).draggable({max: Infinity}).on('dragstart', (evt) ->
+                startY = evt.pageY
+                origTimeStart = scope.time.start
+            ).on('dragmove', (evt) ->
+                delta = startY - evt.pageY
 
+                hourChange = roundToHalf(delta/23)  #XXX fix this constant!
+                # if we drag enough to change the number of hours we span, update everything
+                if hourChange != oldHourChange
+                    oldHourChange = hourChange
+                    scope.time.start = origTimeStart - hourChange
+                    scope.$apply()
+            )
+            interact($(elm).find('.bottom-handle')[0]).draggable({max: Infinity}).on('dragstart', (evt) ->
+                startY = evt.pageY
+                origTimeEnd = scope.time.end
+            ).on('dragmove', (evt) ->
+                delta = startY - evt.pageY
+
+                hourChange = roundToHalf(delta/23)  #XXX fix this constant!
+                # if we drag enough to change the number of hours we span, update everything
+                if hourChange != oldHourChange
+                    oldHourChange = hourChange
+                    scope.time.end = origTimeEnd - hourChange
+                    scope.$apply()
+            )
+
+            ###
+            $(elm).find('.top-handle').click (evt, elm) ->
+                console.log evt, elm
+                scope.time.start -= .5
+                scope.$apply()
+            $(elm).find('.bottom-handle').click (evt, elm) ->
+                console.log evt, elm
+                scope.time.end += .5
+                scope.$apply()
+            ###
+            #elm.bind 'mousemove', (e) ->
+            #
+            #    #console.log e, scope.time, elm, attrs
+    }
 app.controller('TimeViewController', ['$scope', timeviewController])
-
+app.directive('adjustableRange', adjustableRangeDirective)
 

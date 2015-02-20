@@ -47,10 +47,24 @@ rowHeight=25px
 			position: absolute
 			background: rgba(0, 128, 15, 0.75)
 			left: 1em
-			top: rowHeight*1.5
-			height: rowHeight*6
+			//top: rowHeight*1.5
+			//height: rowHeight*6
 			padding: 4px
 			border-radius: 8px
+
+		for num in (1..24)
+			for half in 0 5
+				.hourSpan.length-{num}-{half}
+					height: (num+half/10)*rowHeight
+		for startHour in (-2..28)
+			for startHalf in 0 5
+				.hourSpan.start-{startHour}-{startHalf}
+					// FIX this shouldn't be absolute!!
+					top: (startHour + startHalf/10 + 2)*rowHeight
+
+
 	.time
 		box-sizing: border-box
 		height: rowHeight
+		&.not-today
+			background: gray

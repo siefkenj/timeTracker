@@ -15,8 +15,5 @@ block content
         input(type="number", ng-model="monthNum")
         h1(id="month")= "{{ month() }} {{ monthNum }} "
         table(class='calendar-view', month-view, year-num="yearNum", month-num="monthNum" )
-            each thing in ['week1', 'week2', 'week3', 'week4', 'week5']
-                tr(id=thing)
-                    while (i) % 7 != 0
-                        td(class = 'day')= i++
-                    td(class='day')= i++
+            tr( id='week{{$index + 1}}', ng-repeat='week in displayDays()' )
+                td(class='day', ng-repeat='day in week'){{day}}

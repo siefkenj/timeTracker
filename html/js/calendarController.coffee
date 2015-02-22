@@ -1,3 +1,33 @@
+setupMonth = ( displayMonth ) ->
+    year = displayMonth.getFullYear()
+    month = displayMonth.getMonth()
+    #now setup the month to be displayed properly
+    firstDay = displayMonth.getDay()
+    
+    lastMonth = ( (new Date( year, month, -x )).getDate() for x in [0 ... firstDay] ).reverse()
+
+    numDays = (new Date( year, month+1, 0)).getDate()
+    thisMonth = ( x for x in [1 .. numDays ] )
+
+    remainingDays = (7 - (numDays + firstDay) %% 7) %% 7
+    nextMonth = ( x + 1 for x in [0 ... remainingDays ]  )
+
+    console.log( lastMonth, firstDay )
+    console.log( thisMonth, numDays )
+    console.log( nextMonth, numDays + firstDay, remainingDays )
+    displayDays= lastMonth.concat thisMonth.concat nextMonth
+    result = []
+    week = []
+    for day, index in displayDays
+        week.push(day)
+        console.log( index , day, (index + 1) % 7)
+        if !( (index+1) % 7 )
+            result.push(week)
+            week = []
+    console.log(result)
+
+    return result
+
 app = angular.module 'App', []
 
 app.controller( 'Calendar' , [
@@ -20,37 +50,15 @@ app.controller( 'Calendar' , [
             return date.toLocaleDateString( locale, {month:'long'} )
         $scope.date = ( year, month ) ->
             return new Date( year, month, 1)
+        
+        $scope.displayDays = ->
+            setupMonth( $scope.date($scope.yearNum, $scope.monthNum) )
 
-        $scope.$watch('month', $scope.date)
         return
 ]).directive(
     'monthView'
     () ->
         return{
-            scope:
-                yearNum: '='
-                monthNum: '='
-            link: (scope, element, attrs) ->
-                scope.$watch('monthNum', ->
-                    setupMonth(new Date(scope.yearNum,scope.monthNum,1))
-                )
-                window.xx = scope
-                console.log(scope)
-                console.log( scope.yearNum, scope.monthNum  )
-                #console.log(scope.datex())
-                setupMonth = ( displayMonth ) ->
-                    year = displayMonth.getFullYear()
-                    month = displayMonth.getMonth()
-                    #now setup the month to be displayed properly
-                    firstDay = displayMonth.getDay()
 
-                    numDays = (new Date( year, month+1, 0)).getDate()
-                    for elm, index in document.querySelectorAll('.day')
-                        if index < firstDay || index > numDays+firstDay-1
-                            elm.innerHTML = ''
-                        else
-                            elm.innerHTML = index - firstDay + 1
-                #setupMonth( scope.datex() )
-                setupMonth(new Date(scope.$parent.yearNum,scope.$parent.monthNum,1))
         }
 )

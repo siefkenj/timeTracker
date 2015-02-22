@@ -27,8 +27,8 @@ block content
 			div(class="column hoursGrid" ng-repeat="(k, person) in people")
 				div(class="time {{hour.thisday}}" ng-repeat="hour in hours")
 				div(class="hourSpan {{timeRangeToClassName(time)}}" ng-repeat="time in person.times" adjustable-range="time")= "{{time.end-time.start}} hours"
-					<div class="top-handle">^^^</div>
-					<div class="bottom-handle">---</div>
+					div(class="top-handle")= '^^^'
+					div(class="bottom-handle")= '---'
 			//div(class="column hoursGrid")
 			//	div(class="hourSpan")= "6 hours"
 			//	div(class="time {{hour.thisday}}" ng-repeat="hour in hours")

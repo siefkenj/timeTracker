@@ -5,15 +5,16 @@ block extraCSS
 
 block controller
     script(src='js/jquery-2.1.3.min.js')
-    script(src='js/angular.min.js')
+    script(src='js/angular.js')
     script(src='js/calendarController.js')
 
 block content
     - var i = 1;
     - var j = 0;
-    div(class='container', ng-controller='Calendar') 
-        h1(id="month")= "{{ month }}"
-        table(class='calendar-view') 
+    div(class='container', ng-controller='Calendar')
+        input(type="number", ng-model="monthNum")
+        h1(id="month")= "{{ month() }} {{ monthNum }} "
+        table(class='calendar-view', month-view, year-num="yearNum", month-num="monthNum" )
             each thing in ['week1', 'week2', 'week3', 'week4', 'week5']
                 tr(id=thing)
                     while (i) % 7 != 0

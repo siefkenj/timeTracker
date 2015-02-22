@@ -112,4 +112,3 @@ adjustableRangeDirective = () ->
     }
 app.controller('TimeViewController', ['$scope', timeviewController])
 app.directive('adjustableRange', adjustableRangeDirective)
-

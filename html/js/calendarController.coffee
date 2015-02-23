@@ -3,6 +3,7 @@ setupMonth = ( displayMonth ) ->
     month = displayMonth.getMonth()
     #now setup the month to be displayed properly
     firstDay = displayMonth.getDay()
+
     
     lastMonth = ( (new Date( year, month, -x )).getDate() for x in [0 ... firstDay] ).reverse()
 
@@ -12,9 +13,6 @@ setupMonth = ( displayMonth ) ->
     remainingDays = (7 - (numDays + firstDay) %% 7) %% 7
     nextMonth = ( x + 1 for x in [0 ... remainingDays ]  )
 
-    console.log( lastMonth, firstDay )
-    console.log( thisMonth, numDays )
-    console.log( nextMonth, numDays + firstDay, remainingDays )
     displayDays= lastMonth.concat thisMonth.concat nextMonth
     result = []
     week = []
@@ -24,7 +22,11 @@ setupMonth = ( displayMonth ) ->
         if !( (index+1) % 7 )
             result.push(week)
             week = []
-    console.log(result)
+            
+    #console.log( lastMonth, firstDay )
+    #console.log( thisMonth, numDays )
+    #console.log( nextMonth, numDays + firstDay, remainingDays )
+    #console.log(result)
 
     return result
 
@@ -48,17 +50,11 @@ app.controller( 'Calendar' , [
         $scope.month = ->
             date = new Date($scope.yearNum, $scope.monthNum,1 )
             return date.toLocaleDateString( locale, {month:'long'} )
-        $scope.date = ( year, month ) ->
-            return new Date( year, month, 1)
-        
-        $scope.displayDays = ->
-            setupMonth( $scope.date($scope.yearNum, $scope.monthNum) )
+        $scope.$watch('monthNum', ->
+            $scope.displayDays = setupMonth( new Date($scope.yearNum, $scope.monthNum, 1))
+            
+        )
+
 
         return
-]).directive(
-    'monthView'
-    () ->
-        return{
-
-        }
-)
+])

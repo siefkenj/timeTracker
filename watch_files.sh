@@ -27,7 +27,6 @@ is_watchable() {
 	EXTENSION=${i##*.}
 	if [[ `echo "${WATCHABLE[*]}"|grep $EXTENSION` != "" ]]
 	then
-		echo "matchable!!"
 		return 0
 	fi
 	return 1

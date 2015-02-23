@@ -33,9 +33,6 @@ setupMonth = function(displayMonth) {
     }
     return _results;
   })();
-  console.log(lastMonth, firstDay);
-  console.log(thisMonth, numDays);
-  console.log(nextMonth, numDays + firstDay, remainingDays);
   displayDays = lastMonth.concat(thisMonth.concat(nextMonth));
   result = [];
   week = [];
@@ -48,7 +45,6 @@ setupMonth = function(displayMonth) {
       week = [];
     }
   }
-  console.log(result);
   return result;
 };
 
@@ -70,13 +66,8 @@ app.controller('Calendar', [
         month: 'long'
       });
     };
-    $scope.date = function(year, month) {
-      return new Date(year, month, 1);
-    };
-    $scope.displayDays = function() {
-      return setupMonth($scope.date($scope.yearNum, $scope.monthNum));
-    };
+    $scope.$watch('monthNum', function() {
+      return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1));
+    });
   }
-]).directive('monthView', function() {
-  return {};
-});
+]);

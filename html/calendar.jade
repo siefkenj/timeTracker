@@ -9,11 +9,9 @@ block controller
     script(src='js/calendarController.js')
 
 block content
-    - var i = 1;
-    - var j = 0;
     div(class='container', ng-controller='Calendar')
         input(type="number", ng-model="monthNum")
         h1(id="month")= "{{ month() }} {{ monthNum }} "
         table(class='calendar-view', month-view, year-num="yearNum", month-num="monthNum" )
-            tr( id='week{{$index + 1}}', ng-repeat='week in displayDays()' )
+            tr( id='week{{$index + 1}}', ng-repeat='week in displayDays' )
                 td(class='day', ng-repeat='day in week'){{day}}

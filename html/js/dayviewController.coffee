@@ -3,6 +3,48 @@
 # Helper Functions
 ###
 
+randRange = (start=0, end=5) ->
+    return start + Math.floor(Math.random()*(end-start+1))
+randSample = (array, samples) ->
+    arrayCpy = array.slice()
+    ret = []
+    for i in [0...samples]
+        ret = ret.concat(arrayCpy.splice(randRange(0,arrayCpy.length-1), 1))
+    return ret
+
+createFakeHangoutData = (start=new Date(2015,1,1), end=new Date(2016, 1, 1), people=['Andrei', 'Andrew', 'Jonah', 'Paul']) ->
+    ret = {}
+    curr = new Date(start)
+    while curr <= end
+        todaysHangouts = {}
+
+        numHangouts = randRange(0, people.length)
+        hangouts = randSample(people, numHangouts)
+        for person in hangouts
+            day = []
+            segments = randRange(1,2)
+            if segments > 1
+                startT = randRange(0,23)
+                endT = randRange(startT+1, 24)
+                # divide by two so we get half-hours
+                day.push({start: startT/2, end: endT/2})
+                startT = randRange(endT+1,48)
+                endT = randRange(startT+1, 48)
+                # divide by two so we get half-hours
+                day.push({start: startT/2, end: endT/2})
+            else
+                startT = randRange(0,48)
+                endT = randRange(startT+1, 48)
+                # divide by two so we get half-hours
+                day.push({start: startT/2, end: endT/2})
+            todaysHangouts[person] =
+                name: person
+                times: day
+        ret[curr] = todaysHangouts
+
+        curr.setDate(curr.getDate()+1)
+    return ret
+
 # round to the nearest .5
 roundToHalf = (t) ->
     return Math.round(2*t)/2
@@ -31,6 +73,8 @@ timeRangeToClassName = (t) ->
     len = roundToHalf(t.end-t.start)
     start = roundToHalf(t.start)
     return "length-#{formatNum(len)} start-#{formatNum(start)}"
+formatName = (person) ->
+    return "#{person.name} (#{getTotalHours(person)})"
 
 
 START_TIME = -2
@@ -56,12 +100,16 @@ timeviewController = ($scope) ->
             times: [{start: 16, end: 18.5}]
     $scope.getTotalHours = getTotalHours
     $scope.timeRangeToClassName = timeRangeToClassName
+    $scope.formatName = formatName
 
     $scope.hours = createHourList(START_TIME, END_TIME)
-    $scope.names = ("#{v.name} (#{getTotalHours(v)})" for k,v of $scope.people)
-    console.log $scope.names,$scope.people
+    console.log $scope.people
+
+
+    # set up even listeners to see if we've clicked
+    # and want to add a new time for someone
+
     return
-    #$scope.hours = ["abc", "123"]
 adjustableRangeDirective = () ->
     return {
         link: (scope, elm, attrs) ->
@@ -95,20 +143,12 @@ adjustableRangeDirective = () ->
                     scope.time.end = origTimeEnd - hourChange
                     scope.$apply()
             )
-
-            ###
-            $(elm).find('.top-handle').click (evt, elm) ->
-                console.log evt, elm
-                scope.time.start -= .5
-                scope.$apply()
-            $(elm).find('.bottom-handle').click (evt, elm) ->
-                console.log evt, elm
-                scope.time.end += .5
-                scope.$apply()
-            ###
-            #elm.bind 'mousemove', (e) ->
-            #
-            #    #console.log e, scope.time, elm, attrs
+    }
+timeColumnDirective = () ->
+    return {
+        link: (scope, elm, attrs) ->
+            console.log 'linking!!', scope.person
     }
 app.controller('TimeViewController', ['$scope', timeviewController])
 app.directive('adjustableRange', adjustableRangeDirective)
+app.directive('timeColumn', adjustableRangeDirective)

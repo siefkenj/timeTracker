@@ -2,16 +2,19 @@
 var app, setupMonth,
   __modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
 
-setupMonth = function(displayMonth) {
-  var day, displayDays, firstDay, index, lastMonth, month, nextMonth, numDays, remainingDays, result, thisMonth, week, x, year, _i, _len;
+setupMonth = function(displayMonth, calendarData) {
+  var day, displayDays, firstDay, index, lastMonth, makeLastMonthDate, month, nextMonth, numDays, remainingDays, result, thisMonth, week, x, year, _i, _len;
   year = displayMonth.getFullYear();
   month = displayMonth.getMonth();
   firstDay = displayMonth.getDay();
+  makeLastMonthDate = function(day) {
+    return (new Date(year, month, -day)).getDate();
+  };
   lastMonth = ((function() {
     var _i, _results;
     _results = [];
     for (x = _i = 0; 0 <= firstDay ? _i < firstDay : _i > firstDay; x = 0 <= firstDay ? ++_i : --_i) {
-      _results.push((new Date(year, month, -x)).getDate());
+      _results.push(makeLastMonthDate(x));
     }
     return _results;
   })()).reverse();
@@ -39,7 +42,6 @@ setupMonth = function(displayMonth) {
   for (index = _i = 0, _len = displayDays.length; _i < _len; index = ++_i) {
     day = displayDays[index];
     week.push(day);
-    console.log(index, day, (index + 1) % 7);
     if (!((index + 1) % 7)) {
       result.push(week);
       week = [];
@@ -51,23 +53,29 @@ setupMonth = function(displayMonth) {
 app = angular.module('App', []);
 
 app.controller('Calendar', [
-  '$scope', function($scope) {
-    var locale, month, now, year;
-    locale = 'en-us';
-    now = new Date();
-    year = now.getFullYear();
-    month = now.getMonth();
-    $scope.monthNum = month;
-    $scope.yearNum = year;
-    $scope.month = function() {
-      var date;
-      date = new Date($scope.yearNum, $scope.monthNum, 1);
-      return date.toLocaleDateString(locale, {
-        month: 'long'
+  '$scope', '$http', function($scope, $http) {
+    $http.get("js/test-hangout-data.json").success(function(response) {
+      $scope.calendarData = response;
+    });
+    $scope.$watch('calendarData', function() {
+      var locale, month, now, year;
+      console.log($scope.calendarData);
+      locale = 'en-us';
+      now = new Date();
+      year = now.getFullYear();
+      month = now.getMonth();
+      $scope.monthNum = month;
+      $scope.yearNum = year;
+      $scope.month = function() {
+        var date;
+        date = new Date($scope.yearNum, $scope.monthNum, 1);
+        return date.toLocaleDateString(locale, {
+          month: 'long'
+        });
+      };
+      $scope.$watch('monthNum', function() {
+        return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1));
       });
-    };
-    $scope.$watch('monthNum', function() {
-      return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1));
     });
   }
 ]);

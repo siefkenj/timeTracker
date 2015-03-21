@@ -1,30 +1,31 @@
 doctype html
 html(lang="en", ng-app='App')
-	head
-		title='Time Tracker'
+    head
+        meta(charset="UTF-8", name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+        title='Time Tracker'
 
-		// local content
-		link(href="css/frame.css" rel="stylesheet")
-		block extraCSS
+        // local content
+        link(href="css/frame.css" rel="stylesheet")
+        block extraCSS
 
-		// cdn content
-		link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
+        // cdn content
+        link(rel="stylesheet", href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css")
 
-		block controller
+        block controller
 
-	body
-		div(id="header")
-			div(class="left")
-			div(class="middle")
-				| Time Tracker
-			div(class="right")
-				button(id="stats")="Stats"
-				button(id="options")="Options"
-				button(id="about")="About"
-		div(id="content")
-			block content
-		div(id="footer")
-			div(class="left")
-			div(class="middle")
-				| footer
-			div(class="right")
+    body
+        div(id="header")
+            div(class="left")
+            div(class="middle")
+                | Time Tracker
+            div(class="right")
+                button(id="stats")="Stats"
+                button(id="options")="Options"
+                button(id="about")="About"
+        div(id="content")
+            block content
+        div(id="footer")
+            div(class="left")
+            div(class="middle")
+                | footer
+            div(class="right")

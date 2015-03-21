@@ -14,4 +14,11 @@ block content
         h1(id="month")= "{{ month() }} {{ monthNum }} "
         table(class='calendar-view', month-view, year-num="yearNum", month-num="monthNum" )
             tr( id='week{{$index + 1}}', ng-repeat='week in displayDays' )
-                td(class='day', ng-repeat='day in week'){{day}}
+                td(class='day', ng-repeat='day in week')
+                    p(class='dateNum') {{day.date}}
+                    p(ng-repeat='person in day.data') {{ person.name }}
+                        br
+                        span(ng-repeat='time in person.times')
+                            |&nbsp {{time.start}} &nbsp to &nbsp {{time.end}}
+                            br
+

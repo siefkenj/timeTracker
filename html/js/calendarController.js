@@ -3,12 +3,30 @@ var app, setupMonth,
   __modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
 
 setupMonth = function(displayMonth, calendarData) {
-  var day, displayDays, firstDay, index, lastMonth, makeLastMonthDate, month, nextMonth, numDays, remainingDays, result, thisMonth, week, x, year, _i, _len;
+  var day, displayDays, findDateData, firstDay, index, lastMonth, makeLastMonthDate, makeNextMonthDate, makeThisMonthDate, month, nextMonth, numDays, remainingDays, result, thisMonth, week, x, year, _i, _len;
   year = displayMonth.getFullYear();
   month = displayMonth.getMonth();
   firstDay = displayMonth.getDay();
+  findDateData = function(day, month) {
+    return calendarData[(new Date(year, day, month)).toDateString()];
+  };
   makeLastMonthDate = function(day) {
-    return (new Date(year, month, -day)).getDate();
+    return {
+      date: (new Date(year, month, -day)).getDate(),
+      data: findDateData(day, month - 1)
+    };
+  };
+  makeThisMonthDate = function(day) {
+    return {
+      date: day,
+      data: findDateData(day, month)
+    };
+  };
+  makeNextMonthDate = function(day) {
+    return {
+      date: day,
+      data: findDateData(day, month + 1)
+    };
   };
   lastMonth = ((function() {
     var _i, _results;
@@ -23,7 +41,7 @@ setupMonth = function(displayMonth, calendarData) {
     var _i, _results;
     _results = [];
     for (x = _i = 1; 1 <= numDays ? _i <= numDays : _i >= numDays; x = 1 <= numDays ? ++_i : --_i) {
-      _results.push(x);
+      _results.push(makeThisMonthDate(x));
     }
     return _results;
   })();
@@ -32,7 +50,7 @@ setupMonth = function(displayMonth, calendarData) {
     var _i, _results;
     _results = [];
     for (x = _i = 0; 0 <= remainingDays ? _i < remainingDays : _i > remainingDays; x = 0 <= remainingDays ? ++_i : --_i) {
-      _results.push(x + 1);
+      _results.push(makeNextMonthDate(x + 1));
     }
     return _results;
   })();
@@ -47,6 +65,7 @@ setupMonth = function(displayMonth, calendarData) {
       week = [];
     }
   }
+  console.log(result);
   return result;
 };
 
@@ -55,11 +74,8 @@ app = angular.module('App', []);
 app.controller('Calendar', [
   '$scope', '$http', function($scope, $http) {
     $http.get("js/test-hangout-data.json").success(function(response) {
-      $scope.calendarData = response;
-    });
-    $scope.$watch('calendarData', function() {
       var locale, month, now, year;
-      console.log($scope.calendarData);
+      $scope.calendarData = response;
       locale = 'en-us';
       now = new Date();
       year = now.getFullYear();
@@ -74,7 +90,7 @@ app.controller('Calendar', [
         });
       };
       $scope.$watch('monthNum', function() {
-        return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1));
+        return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1), $scope.calendarData);
       });
     });
   }

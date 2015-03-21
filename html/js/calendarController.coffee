@@ -4,16 +4,33 @@ setupMonth = ( displayMonth, calendarData ) ->
     #now setup the month to be displayed properly
     firstDay = displayMonth.getDay()
 
+    findDateData = (day, month) ->
+        return calendarData[(new Date(year, day, month)).toDateString()]
+
     makeLastMonthDate = (day) ->
-        (new Date( year, month, -day )).getDate()
+        {
+            date:(new Date( year, month, -day )).getDate()
+            data: findDateData(day, month-1)
+        }
+
+    makeThisMonthDate = (day) ->
+        {
+            date:day
+            data: findDateData(day, month)
+        }
+
+    makeNextMonthDate = (day) ->
+        {
+            date: day
+            data: findDateData(day, month+1)
+        }
 
     lastMonth = ( makeLastMonthDate(x) for x in [0 ... firstDay] ).reverse()
-
     numDays = (new Date( year, month+1, 0)).getDate()
-    thisMonth = ( x for x in [1 .. numDays ] )
+    thisMonth = ( makeThisMonthDate x for x in [1 .. numDays ] )
 
     remainingDays = (7 - (numDays + firstDay) %% 7) %% 7
-    nextMonth = ( x + 1 for x in [0 ... remainingDays ]  )
+    nextMonth = ( makeNextMonthDate( x + 1 ) for x in [0 ... remainingDays ]  )
 
     displayDays= lastMonth.concat thisMonth.concat nextMonth
     result = []
@@ -27,7 +44,7 @@ setupMonth = ( displayMonth, calendarData ) ->
     #console.log( lastMonth, firstDay )
     #console.log( thisMonth, numDays )
     #console.log( nextMonth, numDays + firstDay, remainingDays )
-    #console.log(result)
+    console.log(result)
 
     return result
 
@@ -40,10 +57,6 @@ app.controller( 'Calendar' , [
         $http.get("js/test-hangout-data.json")
         .success (response) ->
             $scope.calendarData = response
-            return
-
-        $scope.$watch('calendarData', ->
-            console.log $scope.calendarData
             locale = 'en-us'
             # get the current day of the month
             now = new Date()
@@ -60,9 +73,11 @@ app.controller( 'Calendar' , [
                 date = new Date($scope.yearNum, $scope.monthNum,1 )
                 return date.toLocaleDateString( locale, {month:'long'} )
             $scope.$watch('monthNum', ->
-                $scope.displayDays = setupMonth( new Date($scope.yearNum, $scope.monthNum, 1))
+                $scope.displayDays = setupMonth( 
+                    new Date($scope.yearNum, $scope.monthNum, 1),
+                    $scope.calendarData
+                )
             )
             return
-        )
         return
 ])

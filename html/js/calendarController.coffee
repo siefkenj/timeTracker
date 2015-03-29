@@ -73,7 +73,7 @@ app.controller( 'Calendar' , [
                 date = new Date($scope.yearNum, $scope.monthNum,1 )
                 return date.toLocaleDateString( locale, {month:'long'} )
             $scope.$watch('monthNum', ->
-                $scope.displayDays = setupMonth( 
+                $scope.displayDays = setupMonth(
                     new Date($scope.yearNum, $scope.monthNum, 1),
                     $scope.calendarData
                 )

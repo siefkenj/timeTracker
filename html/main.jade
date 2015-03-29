@@ -4,17 +4,10 @@ block extraCSS
     link(rel="stylesheet", href="css/dayview.css")
 
 block controller
-    script(src='js/jquery-2.1.3.min.js')
-    script(src='js/angular.js')
-    script(src='js/angular-route.js')
-    script(src='js/interact-1.2.3.js')
     script(src='js/mainController.js')
     script(src='js/calendarController.js')
-    script(src='js/interact-1.2.3.js')
     script(src='js/dayviewController.js')
 
 block content
     div(class="view-container")="You've requested the '{{abc}}' page."
         div(class="view-frame", ng-view)="view"
-        
-

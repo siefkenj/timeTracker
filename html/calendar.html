@@ -5,20 +5,26 @@
     <title>Time Tracker</title>
     <!-- local content-->
     <link href="css/frame.css" rel="stylesheet">
+    <link rel="stylesheet" href="css/dayview.css">
     <link rel="stylesheet" href="css/calendar.css">
     <!-- cdn content-->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
+    <!-- Needed Boilerplate for all templates-->
     <script src="js/jquery-2.1.3.min.js"></script>
     <script src="js/angular.js"></script>
+    <script src="js/angular-route.js"></script>
+    <script src="js/interact-1.2.3.js"></script>
+    <script src="js/mainController.js"></script>
     <script src="js/calendarController.js"></script>
+    <script src="js/dayviewController.js"></script>
   </head>
-  <body>
+  <body ng-controller="MainController">
     <div id="header">
       <div class="left"></div>
       <div class="middle">Time Tracker</div>
       <div class="right">
-        <button id="stats">Stats</button>
-        <button id="options">Options</button>
+        <button id="calendar" ng-click="showCalendar()">Calendar</button>
+        <button id="day" ng-click="showDay()">Day</button>
         <button id="about">About</button>
       </div>
     </div>

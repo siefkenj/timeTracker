@@ -33,7 +33,7 @@ mainController = ($scope, $routeParams, $location) ->
 
     #$scope.hours = createHourList(START_TIME, END_TIME)
     #console.log $scope.people
-    
+
     $scope.showCalendar = ->
         $location.url('/calendar')
         console.log 'cal'

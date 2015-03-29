@@ -84,7 +84,7 @@ END_TIME = 24 + 3
 ###
 # START OF THE APP
 ###
-app = angular.module('App', [])
+app = angular.module('dayviewControllers', [])
 
 
 ###

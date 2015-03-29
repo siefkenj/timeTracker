@@ -2,10 +2,12 @@ doctype html
 html(lang="en", ng-app='App')
     head
         meta(charset="UTF-8", name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+
         title='Time Tracker'
 
         // local content
         link(href="css/frame.css" rel="stylesheet")
+        link(rel="stylesheet", href="css/dayview.css")
         block extraCSS
 
         // cdn content
@@ -19,8 +21,8 @@ html(lang="en", ng-app='App')
             div(class="middle")
                 | Time Tracker
             div(class="right")
-                button(id="stats")="Stats"
-                button(id="options")="Options"
+                button(id="calendar", ng-click="showCalendar()")="Calendar"
+                button(id="day", ng-click="showDay()")="Day"
                 button(id="about")="About"
         div(id="content")
             block content

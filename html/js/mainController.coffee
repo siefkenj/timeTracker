@@ -24,6 +24,9 @@ mainController = ($scope, $routeParams, $location) ->
         person1:
             name: 'Andrei'
             times: [{start: 7, end: 14}, {start: 22, end: 26}]
+        person3:
+            name: 'Andrei'
+            times: [{start: 7, end: 14}, {start: 22, end: 26}]
         person2:
             name: 'Jonah'
             times: [{start: 16, end: 18.5}]
@@ -37,7 +40,8 @@ mainController = ($scope, $routeParams, $location) ->
     $scope.showCalendar = ->
         $location.url('/calendar')
         console.log 'cal'
-    $scope.showDay = ->
+    $scope.showDay = (day) ->
+        $scope.people = day.data
         $location.url('/day')
         console.log 'day'
 

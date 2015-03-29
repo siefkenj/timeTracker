@@ -4,7 +4,11 @@
   <h1 id="month">{{ month() }} {{ monthNum }} </h1>
   <table month-view="month-view" year-num="yearNum" month-num="monthNum" class="calendar-view">
     <tr id="week{{$index + 1}}" ng-repeat="week in displayDays">
-      <td ng-repeat="day in week" class="day">{{day}}</td>
+      <td ng-repeat="day in week" class="day">
+        <div ng-click="showDay(day)">Day
+          <p class="dateNum">{{day.date}}</p>
+          <p ng-repeat="person in day.data">{{ person.name }}<br/><span ng-repeat="time in person.times">&nbsp {{time.start}} &nbsp to &nbsp {{time.end}}<br/></span></p></div>
+      </td>
     </tr>
   </table>
 </div>

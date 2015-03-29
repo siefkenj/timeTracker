@@ -91,13 +91,6 @@ app = angular.module('dayviewControllers', [])
 # TimeViewController
 ###
 timeviewController = ($scope) ->
-    $scope.people =
-        person1:
-            name: 'Andrei'
-            times: [{start: 7, end: 14}, {start: 22, end: 26}]
-        person2:
-            name: 'Jonah'
-            times: [{start: 16, end: 18.5}]
     $scope.getTotalHours = getTotalHours
     $scope.timeRangeToClassName = timeRangeToClassName
     $scope.formatName = formatName

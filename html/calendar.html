@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="en" ng-app="App">
   <head>
+    <meta charset="UTF-8" name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
     <title>Time Tracker</title>
     <!-- local content-->
     <link href="css/frame.css" rel="stylesheet">
@@ -27,7 +28,10 @@
         <h1 id="month">{{ month() }} {{ monthNum }} </h1>
         <table month-view year-num="yearNum" month-num="monthNum" class="calendar-view">
           <tr id="week{{$index + 1}}" ng-repeat="week in displayDays">
-            <td ng-repeat="day in week" class="day">{{day}}</td>
+            <td ng-repeat="day in week" class="day">
+              <p class="dateNum">{{day.date}}</p>
+              <p ng-repeat="person in day.data">{{ person.name }}<br><span ng-repeat="time in person.times">&nbsp {{time.start}} &nbsp to &nbsp {{time.end}}<br></span></p>
+            </td>
           </tr>
         </table>
       </div>

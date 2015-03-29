@@ -2,16 +2,37 @@
 var app, setupMonth,
   modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
 
-setupMonth = function(displayMonth) {
-  var day, displayDays, firstDay, i, index, lastMonth, len, month, nextMonth, numDays, remainingDays, result, thisMonth, week, x, year;
+setupMonth = function(displayMonth, calendarData) {
+  var day, displayDays, findDateData, firstDay, i, index, lastMonth, len, makeLastMonthDate, makeNextMonthDate, makeThisMonthDate, month, nextMonth, numDays, remainingDays, result, thisMonth, week, x, year;
   year = displayMonth.getFullYear();
   month = displayMonth.getMonth();
   firstDay = displayMonth.getDay();
+  findDateData = function(day, month) {
+    return calendarData[(new Date(year, day, month)).toDateString()];
+  };
+  makeLastMonthDate = function(day) {
+    return {
+      date: (new Date(year, month, -day)).getDate(),
+      data: findDateData(day, month - 1)
+    };
+  };
+  makeThisMonthDate = function(day) {
+    return {
+      date: day,
+      data: findDateData(day, month)
+    };
+  };
+  makeNextMonthDate = function(day) {
+    return {
+      date: day,
+      data: findDateData(day, month + 1)
+    };
+  };
   lastMonth = ((function() {
     var i, ref, results;
     results = [];
     for (x = i = 0, ref = firstDay; 0 <= ref ? i < ref : i > ref; x = 0 <= ref ? ++i : --i) {
-      results.push((new Date(year, month, -x)).getDate());
+      results.push(makeLastMonthDate(x));
     }
     return results;
   })()).reverse();
@@ -20,7 +41,7 @@ setupMonth = function(displayMonth) {
     var i, ref, results;
     results = [];
     for (x = i = 1, ref = numDays; 1 <= ref ? i <= ref : i >= ref; x = 1 <= ref ? ++i : --i) {
-      results.push(x);
+      results.push(makeThisMonthDate(x));
     }
     return results;
   })();
@@ -29,7 +50,7 @@ setupMonth = function(displayMonth) {
     var i, ref, results;
     results = [];
     for (x = i = 0, ref = remainingDays; 0 <= ref ? i < ref : i > ref; x = 0 <= ref ? ++i : --i) {
-      results.push(x + 1);
+      results.push(makeNextMonthDate(x + 1));
     }
     return results;
   })();
@@ -39,35 +60,38 @@ setupMonth = function(displayMonth) {
   for (index = i = 0, len = displayDays.length; i < len; index = ++i) {
     day = displayDays[index];
     week.push(day);
-    console.log(index, day, (index + 1) % 7);
     if (!((index + 1) % 7)) {
       result.push(week);
       week = [];
     }
   }
+  console.log(result);
   return result;
 };
 
 app = angular.module('calendarControllers', []);
 
 app.controller('Calendar', [
-  '$scope', function($scope) {
-    var locale, month, now, year;
-    locale = 'en-us';
-    now = new Date();
-    year = now.getFullYear();
-    month = now.getMonth();
-    $scope.monthNum = month;
-    $scope.yearNum = year;
-    $scope.month = function() {
-      var date;
-      date = new Date($scope.yearNum, $scope.monthNum, 1);
-      return date.toLocaleDateString(locale, {
-        month: 'long'
+  '$scope', '$http', function($scope, $http) {
+    $http.get("js/test-hangout-data.json").success(function(response) {
+      var locale, month, now, year;
+      $scope.calendarData = response;
+      locale = 'en-us';
+      now = new Date();
+      year = now.getFullYear();
+      month = now.getMonth();
+      $scope.monthNum = month;
+      $scope.yearNum = year;
+      $scope.month = function() {
+        var date;
+        date = new Date($scope.yearNum, $scope.monthNum, 1);
+        return date.toLocaleDateString(locale, {
+          month: 'long'
+        });
+      };
+      $scope.$watch('monthNum', function() {
+        return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1), $scope.calendarData);
       });
-    };
-    $scope.$watch('monthNum', function() {
-      return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1));
     });
   }
 ]);

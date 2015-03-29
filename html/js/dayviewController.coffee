@@ -90,14 +90,21 @@ app = angular.module('dayviewControllers', [])
 ###
 # TimeViewController
 ###
-timeviewController = ($scope) ->
+timeviewController = ($scope, $routeParams, dataService) ->
     $scope.getTotalHours = getTotalHours
     $scope.timeRangeToClassName = timeRangeToClassName
     $scope.formatName = formatName
 
     $scope.hours = createHourList(START_TIME, END_TIME)
     console.log $scope.people
+    console.log 'route params', $routeParams
 
+    dataService.get($routeParams.year, $routeParams.month, $routeParams.day)
+    .then (dayData) ->
+        $scope.people = dayData
+        console.log 'set people to', dayData
+
+    window.xxx = dataService
 
     # set up even listeners to see if we've clicked
     # and want to add a new time for someone
@@ -142,6 +149,6 @@ timeColumnDirective = () ->
         link: (scope, elm, attrs) ->
             console.log 'linking!!', scope.person
     }
-app.controller('TimeViewController', ['$scope', timeviewController])
+app.controller('TimeViewController', ['$scope', '$routeParams', 'dataService', timeviewController])
 app.directive('adjustableRange', adjustableRangeDirective)
 app.directive('timeColumn', adjustableRangeDirective)

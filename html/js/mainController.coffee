@@ -40,10 +40,10 @@ mainController = ($scope, $routeParams, $location) ->
     $scope.showCalendar = ->
         $location.url('/calendar')
         console.log 'cal'
-    $scope.showDay = (day) ->
+    $scope.showDay = (day, date) ->
         $scope.people = day.data
-        $location.url('/day')
-        console.log 'day'
+        $location.url("/day/#{date[0]}/#{date[1]}/#{date[2]}")
+        console.log 'day', day, date
 
     console.log $routeParams
     $scope.abc = $routeParams.id || "default"
@@ -53,6 +53,36 @@ mainController = ($scope, $routeParams, $location) ->
 
     return
 app.controller('MainController', ['$scope', '$routeParams', '$location', mainController])
+
+# create a service that will handle access to all of our data
+dataService = ($http, $q) ->
+    # set up a promise that will deliver all the data
+    deferred = $q.defer()
+    success = (response) ->
+        deferred.resolve(response)
+    failure = (response) ->
+        deferred.reject(response)
+    $http.get("js/test-hangout-data.json").success(success).error(failure)
+    data = deferred.promise
+        
+    ret =
+        get: (year, month, day) ->
+            if year instanceof Date
+                day = year.getDate()
+                month = year.getMonth() + 1
+                year = year.getFullYear()
+            date = new Date(year, month - 1, day)
+
+            # return a promise that gives the data for that day
+            d = $q.defer()
+            data.then (response) ->
+                console.log('resolving promise', response, date.toDateString())
+                d.resolve(response[date.toDateString()] || {})
+            return d.promise
+            
+    return ret
+
+app.factory('dataService', ['$http', '$q', dataService])
 
 app.config(['$routeProvider',
     ($routeProvider) ->

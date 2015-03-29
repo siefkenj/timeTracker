@@ -30,7 +30,7 @@ setupMonth = ( displayMonth ) ->
 
     return result
 
-app = angular.module 'App', []
+app = angular.module('calendarControllers', [])
 
 app.controller( 'Calendar' , [
     '$scope',

@@ -5,25 +5,19 @@ setupMonth = ( displayMonth, calendarData ) ->
     firstDay = displayMonth.getDay()
 
     findDateData = (day, month) ->
-        return calendarData[(new Date(year, day, month)).toDateString()]
+        return calendarData[(new Date(year, month, day)).toDateString()]
 
     makeLastMonthDate = (day) ->
-        {
-            date:(new Date( year, month, -day )).getDate()
-            data: findDateData(day, month-1)
-        }
+        date:(new Date( year, month-1, -day )).getDate()
+        data: findDateData(day, month-1)
 
     makeThisMonthDate = (day) ->
-        {
-            date:day
-            data: findDateData(day, month)
-        }
+        date:day
+        data: findDateData(day, month)
 
     makeNextMonthDate = (day) ->
-        {
-            date: day
-            data: findDateData(day, month+1)
-        }
+        date: day
+        data: findDateData(day, month+1)
 
     lastMonth = ( makeLastMonthDate(x) for x in [0 ... firstDay] ).reverse()
     numDays = (new Date( year, month+1, 0)).getDate()

@@ -20,16 +20,6 @@ app = angular.module('App', ['ngRoute', 'calendarControllers', 'dayviewControlle
 # MainController
 ###
 mainController = ($scope, $routeParams, $location) ->
-    $scope.people =
-        person1:
-            name: 'Andrei'
-            times: [{start: 7, end: 14}, {start: 22, end: 26}]
-        person3:
-            name: 'Andrei'
-            times: [{start: 7, end: 14}, {start: 22, end: 26}]
-        person2:
-            name: 'Jonah'
-            times: [{start: 16, end: 18.5}]
     #$scope.getTotalHours = getTotalHours
     #$scope.timeRangeToClassName = timeRangeToClassName
     #$scope.formatName = formatName
@@ -40,10 +30,11 @@ mainController = ($scope, $routeParams, $location) ->
     $scope.showCalendar = ->
         $location.url('/calendar')
         console.log 'cal'
-    $scope.showDay = (day, date) ->
-        $scope.people = day.data
-        $location.url("/day/#{date[0]}/#{date[1]}/#{date[2]}")
+        return
+    $scope.showDay = (date) ->
+        $location.url("/day/#{date[0]}/#{date[1]+1}/#{date[2]}")
         console.log 'day', day, date
+        return
 
     console.log $routeParams
     $scope.abc = $routeParams.id || "default"

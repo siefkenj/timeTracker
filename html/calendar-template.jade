@@ -4,7 +4,7 @@ div(class='container', ng-controller='Calendar')
     table(class='calendar-view', month-view, year-num="yearNum", month-num="monthNum" )
         tr( id='week{{$index + 1}}', ng-repeat='week in displayDays' )
             td(class='day', ng-repeat='day in week')
-                div(ng-click="showDay(day, [yearNum, monthNum, day.date])")="Day"
+                div(ng-click="showDay([yearNum, monthNum, day.date])")="Day"
                     p(class='dateNum') {{day.date}}
                     p(ng-repeat='person in day.data') {{ person.name }}
                         //br

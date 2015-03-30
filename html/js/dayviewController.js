@@ -3,7 +3,7 @@
 /*
  * Helper Functions
  */
-var END_TIME, START_TIME, adjustableRangeDirective, app, createFakeHangoutData, createHourList, formatName, getTotalHours, randRange, randSample, roundToHalf, timeColumnDirective, timeRangeToClassName, timeviewController,
+var END_TIME, START_TIME, adjustableHourWidget, adjustableRangeDirective, app, createFakeHangoutData, createHourList, formatName, getTotalHours, personDayInfoWidget, randRange, randSample, roundToHalf, timeColumnDirective, timeRangeToClassName, timeviewController,
   modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
 
 randRange = function(start, end) {
@@ -170,7 +170,23 @@ timeviewController = function($scope, $routeParams, dataService) {
     $scope.people = dayData;
     return console.log('set people to', dayData);
   });
+  $scope.booger = {
+    start: -1
+  };
   window.xxx = dataService;
+  window.yyy = $scope;
+  $scope.pp = {
+    name: 'Tomas',
+    timespans: [
+      {
+        start: 4,
+        end: 10
+      }, {
+        start: 2,
+        end: 6
+      }
+    ]
+  };
 };
 
 adjustableRangeDirective = function() {
@@ -228,3 +244,67 @@ app.controller('TimeViewController', ['$scope', '$routeParams', 'dataService', t
 app.directive('adjustableRange', adjustableRangeDirective);
 
 app.directive('timeColumn', adjustableRangeDirective);
+
+adjustableHourWidget = function() {
+  var directiveDefinitionObject;
+  directiveDefinitionObject = {
+    templateUrl: 'templates/adjustable-hour-widget-textbased.html',
+    restrict: 'E',
+    scope: {
+      startHour: '=startHour',
+      endHour: '=endHour'
+    },
+    link: function(scope, element, attr) {
+      return console.log('meme', scope, element, attr);
+    },
+    controller: function($scope) {
+      console.log('das controller', $scope);
+      return $scope.increment = function(which, direction) {
+        if (which === 'start' && direction === '+') {
+          $scope.startHour += .5;
+        }
+        if (which === 'start' && direction === '-') {
+          $scope.startHour -= .5;
+        }
+        if (which === 'end' && direction === '+') {
+          $scope.endHour += .5;
+        }
+        if (which === 'end' && direction === '-') {
+          return $scope.endHour -= .5;
+        }
+      };
+    }
+  };
+  return directiveDefinitionObject;
+};
+
+app.directive('adjustableHourWidget', adjustableHourWidget);
+
+personDayInfoWidget = function() {
+  var directiveDefinitionObject;
+  directiveDefinitionObject = {
+    templateUrl: 'templates/person-day-info-textbased.html',
+    restrict: 'E',
+    scope: {
+      person: "=person"
+    },
+    controller: function($scope) {
+      var setTotalHours;
+      setTotalHours = function() {
+        var j, len1, ref, timespan, total;
+        total = 0;
+        ref = $scope.person.times;
+        for (j = 0, len1 = ref.length; j < len1; j++) {
+          timespan = ref[j];
+          total += timespan.end - timespan.start;
+        }
+        return $scope.totalHours = total;
+      };
+      $scope.$watch('person.times', setTotalHours, true);
+      return console.log('das controller for persondayinfo', $scope, $scope.person);
+    }
+  };
+  return directiveDefinitionObject;
+};
+
+app.directive('personDayInfoWidget', personDayInfoWidget);

@@ -103,7 +103,13 @@ timeviewController = ($scope, $routeParams, dataService) ->
         $scope.people = dayData
         console.log 'set people to', dayData
 
+    $scope.booger = {start: -1}
     window.xxx = dataService
+    window.yyy = $scope
+
+    $scope.pp =
+        name: 'Tomas'
+        timespans: [{start: 4, end: 10}, {start: 2, end: 6}]
 
     # set up even listeners to see if we've clicked
     # and want to add a new time for someone
@@ -151,3 +157,50 @@ timeColumnDirective = () ->
 app.controller('TimeViewController', ['$scope', '$routeParams', 'dataService', timeviewController])
 app.directive('adjustableRange', adjustableRangeDirective)
 app.directive('timeColumn', adjustableRangeDirective)
+
+adjustableHourWidget = ->
+    directiveDefinitionObject =
+        templateUrl: 'templates/adjustable-hour-widget-textbased.html'
+        restrict: 'E'
+        scope:
+            startHour: '=startHour'
+            endHour: '=endHour'
+        link: (scope, element, attr) ->
+            console.log 'meme', scope, element, attr
+        controller: ($scope) ->
+            console.log 'das controller', $scope
+            $scope.increment = (which, direction) ->
+                if which == 'start' and direction == '+'
+                    $scope.startHour += .5
+                if which == 'start' and direction == '-'
+                    $scope.startHour -= .5
+                if which == 'end' and direction == '+'
+                    $scope.endHour += .5
+                if which == 'end' and direction == '-'
+                    $scope.endHour -= .5
+    return directiveDefinitionObject
+
+app.directive('adjustableHourWidget', adjustableHourWidget)
+
+personDayInfoWidget = ->
+    directiveDefinitionObject =
+        templateUrl: 'templates/person-day-info-textbased.html'
+        restrict: 'E'
+        #transclude: true
+        scope: {
+            person: "=person"
+        }
+        #link: (scope, element, attr) ->
+        #    console.log 'meme', scope, element, attr
+        controller: ($scope) ->
+            setTotalHours = ->
+                total = 0
+                for timespan in $scope.person.times
+                    total += timespan.end - timespan.start
+                $scope.totalHours = total
+
+            $scope.$watch('person.times', setTotalHours, true)
+            console.log 'das controller for persondayinfo', $scope, $scope.person
+    return directiveDefinitionObject
+
+app.directive('personDayInfoWidget', personDayInfoWidget)

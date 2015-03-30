@@ -1,5 +1,10 @@
 
-<div id="container" ng-controller="TimeViewController">
+<div id="container" ng-controller="TimeViewController">hi there
+  <!--adjustable-hour-widget(start-hour="booger.start", end-hour="12")-->
+  <!--person-day-info-widget(person="pp")-->
+  <div ng-repeat="(k, person) in people">
+    <person-day-info-widget person="person"></person-day-info-widget>
+  </div>
   <div class="hourScrollerHeader">
     <div class="column hours"></div>
     <div ng-repeat="(k, person) in people" class="column name">{{formatName(person)}}</div>

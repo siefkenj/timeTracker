@@ -33,7 +33,7 @@ mainController = ($scope, $routeParams, $location) ->
         return
     $scope.showDay = (date) ->
         $location.url("/day/#{date[0]}/#{date[1]+1}/#{date[2]}")
-        console.log 'day', day, date
+        console.log 'day', date
         return
 
     console.log $routeParams

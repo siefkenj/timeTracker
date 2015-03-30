@@ -4,4 +4,6 @@
 <div class="person-day-info-container">{{person.name}} ({{totalHours}} hours total)
   <div ng-repeat="timespan in person.times">
     <adjustable-hour-widget start-hour="timespan.start" end-hour="timespan.end"></adjustable-hour-widget>
-  </div></div>
+    <button ng-click="removeTimespan($index)">Remove</button>
+  </div>
+  <button ng-click="newTimespan()">New</button></div>

@@ -200,7 +200,11 @@ personDayInfoWidget = ->
                 $scope.totalHours = total
 
             $scope.$watch('person.times', setTotalHours, true)
-            console.log 'das controller for persondayinfo', $scope, $scope.person
+            $scope.newTimespan = ->
+                $scope.person.times.push({start: 10, end: 11})
+            $scope.removeTimespan = (i) ->
+                $scope.person.times.splice(i, 1)
+
     return directiveDefinitionObject
 
 app.directive('personDayInfoWidget', personDayInfoWidget)

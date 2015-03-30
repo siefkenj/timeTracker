@@ -301,7 +301,15 @@ personDayInfoWidget = function() {
         return $scope.totalHours = total;
       };
       $scope.$watch('person.times', setTotalHours, true);
-      return console.log('das controller for persondayinfo', $scope, $scope.person);
+      $scope.newTimespan = function() {
+        return $scope.person.times.push({
+          start: 10,
+          end: 11
+        });
+      };
+      return $scope.removeTimespan = function(i) {
+        return $scope.person.times.splice(i, 1);
+      };
     }
   };
   return directiveDefinitionObject;

@@ -3,7 +3,7 @@
 /*
  * Helper Functions
  */
-var END_TIME, START_TIME, adjustableHourWidget, adjustableRangeDirective, app, createFakeHangoutData, createHourList, formatName, getTotalHours, personDayInfoWidget, randRange, randSample, roundToHalf, timeColumnDirective, timeRangeToClassName, timeviewController,
+var END_TIME, START_TIME, adjustableHourWidget, adjustableRangeDirective, app, createHourList, formatName, getTotalHours, personDayInfoWidget, randRange, randSample, roundToHalf, timeColumnDirective, timeRangeToClassName, timeviewController,
   modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
 
 randRange = function(start, end) {
@@ -22,59 +22,6 @@ randSample = function(array, samples) {
   ret = [];
   for (i = j = 0, ref = samples; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
     ret = ret.concat(arrayCpy.splice(randRange(0, arrayCpy.length - 1), 1));
-  }
-  return ret;
-};
-
-createFakeHangoutData = function(start, end, people) {
-  var curr, day, endT, hangouts, j, len1, numHangouts, person, ret, segments, startT, todaysHangouts;
-  if (start == null) {
-    start = new Date(2015, 1, 1);
-  }
-  if (end == null) {
-    end = new Date(2016, 1, 1);
-  }
-  if (people == null) {
-    people = ['Andrei', 'Andrew', 'Jonah', 'Paul'];
-  }
-  ret = {};
-  curr = new Date(start);
-  while (curr <= end) {
-    todaysHangouts = {};
-    numHangouts = randRange(0, people.length);
-    hangouts = randSample(people, numHangouts);
-    for (j = 0, len1 = hangouts.length; j < len1; j++) {
-      person = hangouts[j];
-      day = [];
-      segments = randRange(1, 2);
-      if (segments > 1) {
-        startT = randRange(0, 23);
-        endT = randRange(startT + 1, 24);
-        day.push({
-          start: startT / 2,
-          end: endT / 2
-        });
-        startT = randRange(endT + 1, 48);
-        endT = randRange(startT + 1, 48);
-        day.push({
-          start: startT / 2,
-          end: endT / 2
-        });
-      } else {
-        startT = randRange(0, 48);
-        endT = randRange(startT + 1, 48);
-        day.push({
-          start: startT / 2,
-          end: endT / 2
-        });
-      }
-      todaysHangouts[person] = {
-        name: person,
-        times: day
-      };
-    }
-    ret[curr] = todaysHangouts;
-    curr.setDate(curr.getDate() + 1);
   }
   return ret;
 };

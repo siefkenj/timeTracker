@@ -4,44 +4,12 @@
 
 randRange = (start=0, end=5) ->
     return start + Math.floor(Math.random()*(end-start+1))
+
 randSample = (array, samples) ->
     arrayCpy = array.slice()
     ret = []
     for i in [0...samples]
         ret = ret.concat(arrayCpy.splice(randRange(0,arrayCpy.length-1), 1))
-    return ret
-
-createFakeHangoutData = (start=new Date(2015,1,1), end=new Date(2016, 1, 1), people=['Andrei', 'Andrew', 'Jonah', 'Paul']) ->
-    ret = {}
-    curr = new Date(start)
-    while curr <= end
-        todaysHangouts = {}
-
-        numHangouts = randRange(0, people.length)
-        hangouts = randSample(people, numHangouts)
-        for person in hangouts
-            day = []
-            segments = randRange(1,2)
-            if segments > 1
-                startT = randRange(0,23)
-                endT = randRange(startT+1, 24)
-                # divide by two so we get half-hours
-                day.push({start: startT/2, end: endT/2})
-                startT = randRange(endT+1,48)
-                endT = randRange(startT+1, 48)
-                # divide by two so we get half-hours
-                day.push({start: startT/2, end: endT/2})
-            else
-                startT = randRange(0,48)
-                endT = randRange(startT+1, 48)
-                # divide by two so we get half-hours
-                day.push({start: startT/2, end: endT/2})
-            todaysHangouts[person] =
-                name: person
-                times: day
-        ret[curr] = todaysHangouts
-
-        curr.setDate(curr.getDate()+1)
     return ret
 
 # round to the nearest .5

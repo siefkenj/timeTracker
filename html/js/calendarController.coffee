@@ -47,7 +47,21 @@ app = angular.module('calendarControllers', [])
 app.controller( 'Calendar' , [
     '$scope',
     '$http',
-    ( $scope, $http ) ->
+    'dataService'
+    ( $scope, $http, dataService ) ->
+        #the calendar defaults to show the current month
+        now = new Date()
+        year = now.getFullYear()
+        month = now.getMonth()
+
+        #month numbers visible to the screen!!
+        $scope.monthNum = month
+        $scope.yearNum = year
+
+        dataService.get now
+        .then (dayData) ->
+            $scope.calendarData = dayData
+            console.log 'set data to', dayData
         $http.get("js/test-hangout-data.json")
         .success (response) ->
             $scope.calendarData = response
@@ -69,7 +83,9 @@ app.controller( 'Calendar' , [
             $scope.$watch('monthNum', ->
                 $scope.displayDays = setupMonth(
                     new Date($scope.yearNum, $scope.monthNum, 1),
-                    $scope.calendarData
+                    $scope.calendarData,
+                    dataService
+
                 )
             )
             return

@@ -72,9 +72,19 @@ setupMonth = function(displayMonth, calendarData) {
 app = angular.module('calendarControllers', []);
 
 app.controller('Calendar', [
-  '$scope', '$http', function($scope, $http) {
+  '$scope', '$http', 'dataService', function($scope, $http, dataService) {
+    var month, now, year;
+    now = new Date();
+    year = now.getFullYear();
+    month = now.getMonth();
+    $scope.monthNum = month;
+    $scope.yearNum = year;
+    dataService.get(now).then(function(dayData) {
+      $scope.calendarData = dayData;
+      return console.log('set data to', dayData);
+    });
     $http.get("js/test-hangout-data.json").success(function(response) {
-      var locale, month, now, year;
+      var locale;
       $scope.calendarData = response;
       locale = 'en-us';
       now = new Date();
@@ -90,7 +100,7 @@ app.controller('Calendar', [
         });
       };
       $scope.$watch('monthNum', function() {
-        return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1), $scope.calendarData);
+        return $scope.displayDays = setupMonth(new Date($scope.yearNum, $scope.monthNum, 1), $scope.calendarData, dataService);
       });
     });
   }

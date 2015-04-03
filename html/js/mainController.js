@@ -58,7 +58,6 @@ dataService = function($http, $q) {
       date = new Date(year, month - 1, day);
       d = $q.defer();
       data.then(function(response) {
-        console.log('resolving promise', response, date.toDateString());
         return d.resolve(response[date.toDateString()] || {});
       });
       return d.promise;

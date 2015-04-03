@@ -62,7 +62,6 @@ dataService = ($http, $q) ->
             # return a promise that gives the data for that day
             d = $q.defer()
             data.then (response) ->
-                console.log('resolving promise', response, date.toDateString())
                 d.resolve(response[date.toDateString()] || {})
             return d.promise
             

@@ -5,14 +5,11 @@
   <table month-view="month-view" year-num="yearNum" month-num="monthNum" class="calendar-view">
     <tr id="week{{$index + 1}}" ng-repeat="week in displayDays">
       <td ng-repeat="day in week" class="day">
-        <div ng-click="showDay([yearNum, monthNum, day.date])">Day
-          <p class="dateNum">{{day.date}}</p>
-          <p ng-repeat="person in day.data">{{ person.name }}
-            <!--br-->
-            <!--span(ng-repeat='time in person.times')-->
-            <!--    |&nbsp {{time.start}} &nbsp to &nbsp {{time.end}}-->
-            <!--    br-->
-          </p></div>
+        <div ng-click="showDay([yearNum, monthNum, day.date])">
+          <calendar-day-widget day="day"></calendar-day-widget>
+          <!--p(class='dateNum') {{day.date}}-->
+          <!--p(ng-repeat='person in day.data') {{ person.name }}-->
+        </div>
       </td>
     </tr>
   </table>

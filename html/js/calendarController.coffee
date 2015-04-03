@@ -1,4 +1,4 @@
-setupMonth = ( displayMonth, calendarData ) ->
+setupMonth = ( displayMonth, calendarData, dataService ) ->
     year = displayMonth.getFullYear()
     month = displayMonth.getMonth()
     #now setup the month to be displayed properly
@@ -9,7 +9,9 @@ setupMonth = ( displayMonth, calendarData ) ->
 
     makeLastMonthDate = (day) ->
         date:(new Date( year, month-1, -day )).getDate()
-        data: findDateData(day, month-1)
+        data: dataService.get year, month - 1, day
+            .then (dayData) ->
+                dayData
 
     makeThisMonthDate = (day) ->
         date:day
@@ -35,11 +37,7 @@ setupMonth = ( displayMonth, calendarData ) ->
             result.push(week)
             week = []
 
-    #console.log( lastMonth, firstDay )
-    #console.log( thisMonth, numDays )
-    #console.log( nextMonth, numDays + firstDay, remainingDays )
-    console.log(result)
-
+    console.log result
     return result
 
 app = angular.module('calendarControllers', [])
@@ -58,10 +56,6 @@ app.controller( 'Calendar' , [
         $scope.monthNum = month
         $scope.yearNum = year
 
-        dataService.get now
-        .then (dayData) ->
-            $scope.calendarData = dayData
-            console.log 'set data to', dayData
         $http.get("js/test-hangout-data.json")
         .success (response) ->
             $scope.calendarData = response
@@ -80,14 +74,27 @@ app.controller( 'Calendar' , [
             $scope.month = ->
                 date = new Date($scope.yearNum, $scope.monthNum,1 )
                 return date.toLocaleDateString( locale, {month:'long'} )
+
+
             $scope.$watch('monthNum', ->
                 $scope.displayDays = setupMonth(
                     new Date($scope.yearNum, $scope.monthNum, 1),
                     $scope.calendarData,
                     dataService
-
                 )
             )
             return
         return
 ])
+calendarDayWidget = ->
+    templateUrl: 'templates/calendar_day_widget.html'
+    restrict: 'E'
+    #transclude: true
+    scope:
+        day: "=day"
+    #link: (scope, element, attr) ->
+    #    console.log 'meme', scope, element, attr
+    controller: ($scope) ->
+        console.log 'here is the calendar data', $scope.day
+
+app.directive('calendarDayWidget', calendarDayWidget)

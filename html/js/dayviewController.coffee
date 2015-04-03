@@ -83,96 +83,90 @@ timeviewController = ($scope, $routeParams, dataService) ->
     # and want to add a new time for someone
 
     return
+
 adjustableRangeDirective = () ->
-    return {
-        link: (scope, elm, attrs) ->
-            oldHourChange = null
-            startY = null
+    link: (scope, elm, attrs) ->
+        oldHourChange = null
+        startY = null
+        origTimeStart = scope.time.start
+        origTimeEnd = scope.time.end
+        interact($(elm).find('.top-handle')[0]).draggable({max: Infinity}).on('dragstart', (evt) ->
+            startY = evt.pageY
             origTimeStart = scope.time.start
+        ).on('dragmove', (evt) ->
+            delta = startY - evt.pageY
+
+            hourChange = roundToHalf(delta/23)  #XXX fix this constant!
+            # if we drag enough to change the number of hours we span, update everything
+            if hourChange != oldHourChange
+                oldHourChange = hourChange
+                scope.time.start = origTimeStart - hourChange
+                scope.$apply()
+        )
+        interact($(elm).find('.bottom-handle')[0]).draggable({max: Infinity}).on('dragstart', (evt) ->
+            startY = evt.pageY
             origTimeEnd = scope.time.end
-            interact($(elm).find('.top-handle')[0]).draggable({max: Infinity}).on('dragstart', (evt) ->
-                startY = evt.pageY
-                origTimeStart = scope.time.start
-            ).on('dragmove', (evt) ->
-                delta = startY - evt.pageY
+        ).on('dragmove', (evt) ->
+            delta = startY - evt.pageY
 
-                hourChange = roundToHalf(delta/23)  #XXX fix this constant!
-                # if we drag enough to change the number of hours we span, update everything
-                if hourChange != oldHourChange
-                    oldHourChange = hourChange
-                    scope.time.start = origTimeStart - hourChange
-                    scope.$apply()
-            )
-            interact($(elm).find('.bottom-handle')[0]).draggable({max: Infinity}).on('dragstart', (evt) ->
-                startY = evt.pageY
-                origTimeEnd = scope.time.end
-            ).on('dragmove', (evt) ->
-                delta = startY - evt.pageY
+            hourChange = roundToHalf(delta/23)  #XXX fix this constant!
+            # if we drag enough to change the number of hours we span, update everything
+            if hourChange != oldHourChange
+                oldHourChange = hourChange
+                scope.time.end = origTimeEnd - hourChange
+                scope.$apply()
+        )
 
-                hourChange = roundToHalf(delta/23)  #XXX fix this constant!
-                # if we drag enough to change the number of hours we span, update everything
-                if hourChange != oldHourChange
-                    oldHourChange = hourChange
-                    scope.time.end = origTimeEnd - hourChange
-                    scope.$apply()
-            )
-    }
 timeColumnDirective = () ->
-    return {
-        link: (scope, elm, attrs) ->
-            console.log 'linking!!', scope.person
-    }
+    link: (scope, elm, attrs) ->
+        console.log 'linking!!', scope.person
+
 app.controller('TimeViewController', ['$scope', '$routeParams', 'dataService', timeviewController])
 app.directive('adjustableRange', adjustableRangeDirective)
 app.directive('timeColumn', adjustableRangeDirective)
 
 adjustableHourWidget = ->
-    directiveDefinitionObject =
-        templateUrl: 'templates/adjustable-hour-widget-textbased.html'
-        restrict: 'E'
-        scope:
-            startHour: '=startHour'
-            endHour: '=endHour'
-        link: (scope, element, attr) ->
-            console.log 'meme', scope, element, attr
-        controller: ($scope) ->
-            console.log 'das controller', $scope
-            $scope.increment = (which, direction) ->
-                if which == 'start' and direction == '+'
-                    $scope.startHour += .5
-                if which == 'start' and direction == '-'
-                    $scope.startHour -= .5
-                if which == 'end' and direction == '+'
-                    $scope.endHour += .5
-                if which == 'end' and direction == '-'
-                    $scope.endHour -= .5
-    return directiveDefinitionObject
+    templateUrl: 'templates/adjustable-hour-widget-textbased.html'
+    restrict: 'E'
+    scope:
+        startHour: '=startHour'
+        endHour: '=endHour'
+    link: (scope, element, attr) ->
+        console.log 'meme', scope, element, attr
+    controller: ($scope) ->
+        console.log 'das controller', $scope
+        $scope.increment = (which, direction) ->
+            if which == 'start' and direction == '+'
+                $scope.startHour += .5
+            if which == 'start' and direction == '-'
+                $scope.startHour -= .5
+            if which == 'end' and direction == '+'
+                $scope.endHour += .5
+            if which == 'end' and direction == '-'
+                $scope.endHour -= .5
 
 app.directive('adjustableHourWidget', adjustableHourWidget)
 
 personDayInfoWidget = ->
-    directiveDefinitionObject =
-        templateUrl: 'templates/person-day-info-textbased.html'
-        restrict: 'E'
-        #transclude: true
-        scope: {
-            person: "=person"
-        }
-        #link: (scope, element, attr) ->
-        #    console.log 'meme', scope, element, attr
-        controller: ($scope) ->
-            setTotalHours = ->
-                total = 0
-                for timespan in $scope.person.times
-                    total += timespan.end - timespan.start
-                $scope.totalHours = total
+    templateUrl: 'templates/person-day-info-textbased.html'
+    restrict: 'E'
+    #transclude: true
+    scope: {
+        person: "=person"
+    }
+    #link: (scope, element, attr) ->
+    #    console.log 'meme', scope, element, attr
+    controller: ($scope) ->
+        setTotalHours = ->
+            total = 0
+            for timespan in $scope.person.times
+                total += timespan.end - timespan.start
+            $scope.totalHours = total
 
-            $scope.$watch('person.times', setTotalHours, true)
-            $scope.newTimespan = ->
-                $scope.person.times.push({start: 10, end: 11})
-            $scope.removeTimespan = (i) ->
-                $scope.person.times.splice(i, 1)
-
-    return directiveDefinitionObject
+        $scope.$watch('person.times', setTotalHours, true)
+        $scope.newTimespan = ->
+            $scope.person.times.push({start: 10, end: 11})
+        $scope.removeTimespan = (i) ->
+            $scope.person.times.splice(i, 1)
 
 app.directive('personDayInfoWidget', personDayInfoWidget)

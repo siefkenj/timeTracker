@@ -193,8 +193,7 @@ app.directive('adjustableRange', adjustableRangeDirective);
 app.directive('timeColumn', adjustableRangeDirective);
 
 adjustableHourWidget = function() {
-  var directiveDefinitionObject;
-  directiveDefinitionObject = {
+  return {
     templateUrl: 'templates/adjustable-hour-widget-textbased.html',
     restrict: 'E',
     scope: {
@@ -222,14 +221,12 @@ adjustableHourWidget = function() {
       };
     }
   };
-  return directiveDefinitionObject;
 };
 
 app.directive('adjustableHourWidget', adjustableHourWidget);
 
 personDayInfoWidget = function() {
-  var directiveDefinitionObject;
-  directiveDefinitionObject = {
+  return {
     templateUrl: 'templates/person-day-info-textbased.html',
     restrict: 'E',
     scope: {
@@ -259,7 +256,6 @@ personDayInfoWidget = function() {
       };
     }
   };
-  return directiveDefinitionObject;
 };
 
 app.directive('personDayInfoWidget', personDayInfoWidget);

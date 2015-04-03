@@ -3,18 +3,13 @@
 # Helper Functions
 ###
 
-
-
-
 START_TIME = -2
 END_TIME = 24 + 3
-
 
 ###
 # START OF THE APP
 ###
 app = angular.module('App', ['ngRoute', 'calendarControllers', 'dayviewControllers'])
-
 
 ###
 # MainController

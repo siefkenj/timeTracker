@@ -70,6 +70,32 @@ dataService = ($http, $q) ->
                 console.log('resolving promise', response, date.toDateString())
                 d.resolve(response[date.toDateString()] || {})
             return d.promise
+        getPossibleNames: ->
+            # simulate a promise for now
+            return {
+                then: (f) ->
+                    f(['Andrei', 'Andrew', 'Jonah', 'Paul'])
+            }
+        addPersonToDay: (args={}) ->
+            {year, month, day, person} = args
+            if year instanceof Date
+                day = year.getDate()
+                month = year.getMonth() + 1
+                year = year.getFullYear()
+            date = new Date(year, month - 1, day)
+            
+            # return a promise that resolves when the person
+            # has been successfully added
+            d = $q.defer()
+
+            # for now, nothing will be permenantly changed
+            data.then (response) ->
+                response[date.toDateString()][person.name] =
+                    name: person.name
+                    times: [{start:10,end:11}]
+                d.resolve()
+            return d.promise
+
             
     return ret
 

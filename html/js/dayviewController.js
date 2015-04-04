@@ -3,7 +3,7 @@
 /*
  * Helper Functions
  */
-var END_TIME, START_TIME, adjustableHourWidget, adjustableRangeDirective, app, createFakeHangoutData, createHourList, formatName, getTotalHours, personDayInfoWidget, randRange, randSample, roundToHalf, timeColumnDirective, timeRangeToClassName, timeviewController,
+var END_TIME, START_TIME, adjustableHourWidget, adjustableRangeDirective, app, createFakeHangoutData, createHourList, formatName, getTotalHours, newPersonDialog, personDayInfoWidget, randRange, randSample, roundToHalf, timeColumnDirective, timeRangeToClassName, timeviewController,
   modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
 
 randRange = function(start, end) {
@@ -160,18 +160,43 @@ app = angular.module('dayviewControllers', []);
  */
 
 timeviewController = function($scope, $routeParams, dataService) {
+  var updatePeople;
   $scope.getTotalHours = getTotalHours;
   $scope.timeRangeToClassName = timeRangeToClassName;
   $scope.formatName = formatName;
   $scope.hours = createHourList(START_TIME, END_TIME);
   console.log($scope.people);
   console.log('route params', $routeParams);
-  dataService.get($routeParams.year, $routeParams.month, $routeParams.day).then(function(dayData) {
-    $scope.people = dayData;
-    return console.log('set people to', dayData);
+  updatePeople = function() {
+    return dataService.get($routeParams.year, $routeParams.month, $routeParams.day).then(function(dayData) {
+      $scope.people = dayData;
+      return console.log('set people to', dayData);
+    });
+  };
+  updatePeople();
+  $scope.possibleNames = [];
+  dataService.getPossibleNames().then(function(names) {
+    $scope.possibleNames = names;
+    return console.log('got possible names', names);
   });
-  $scope.booger = {
-    start: -1
+  $scope.showNewPersonDialog = false;
+  $scope.newPerson = function() {
+    return $scope.showNewPersonDialog = true;
+  };
+  $scope.addPerson = function(person) {
+    var promise;
+    promise = dataService.addPersonToDay({
+      year: $routeParams.year,
+      month: $routeParams.month,
+      day: $routeParams.day,
+      person: {
+        name: person
+      }
+    });
+    return promise.then(function() {
+      updatePeople();
+      return console.log("Adding", person);
+    });
   };
   window.xxx = dataService;
   window.yyy = $scope;
@@ -316,3 +341,32 @@ personDayInfoWidget = function() {
 };
 
 app.directive('personDayInfoWidget', personDayInfoWidget);
+
+newPersonDialog = function() {
+  var directiveDefinitionObject;
+  directiveDefinitionObject = {
+    templateUrl: 'templates/new-person-textbased.html',
+    restrict: 'E',
+    scope: {
+      possibleNames: "=possibleNames",
+      addPerson: "=addPerson",
+      showDialog: "=ngShow"
+    },
+    controller: function($scope) {
+      $scope.addPersonClick = function(newName) {
+        console.log("you want to add " + newName);
+        if (typeof $scope.addPerson === "function") {
+          $scope.addPerson(newName);
+        }
+        return $scope.showDialog = false;
+      };
+      return $scope.cancel = function() {
+        console.log("canceling...");
+        return $scope.showDialog = false;
+      };
+    }
+  };
+  return directiveDefinitionObject;
+};
+
+app.directive('newPersonDialog', newPersonDialog);

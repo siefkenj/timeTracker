@@ -3,6 +3,9 @@ div(id="container", ng-controller="TimeViewController")
     //adjustable-hour-widget(start-hour="booger.start", end-hour="12")
     //person-day-info-widget(person="pp")
 
+    button(ng-click="newPerson()")="New Person"
+    new-person-dialog(ng-show="showNewPersonDialog", possible-names="possibleNames", add-person="addPerson")
+    
     div(ng-repeat="(k, person) in people")
         person-day-info-widget(person="person")
 

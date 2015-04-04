@@ -2,6 +2,8 @@
 <div id="container" ng-controller="TimeViewController">hi there
   <!--adjustable-hour-widget(start-hour="booger.start", end-hour="12")-->
   <!--person-day-info-widget(person="pp")-->
+  <button ng-click="newPerson()">New Person</button>
+  <new-person-dialog ng-show="showNewPersonDialog" possible-names="possibleNames" add-person="addPerson"></new-person-dialog>
   <div ng-repeat="(k, person) in people">
     <person-day-info-widget person="person"></person-day-info-widget>
   </div>

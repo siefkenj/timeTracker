@@ -62,6 +62,40 @@ dataService = function($http, $q) {
         return d.resolve(response[date.toDateString()] || {});
       });
       return d.promise;
+    },
+    getPossibleNames: function() {
+      return {
+        then: function(f) {
+          return f(['Andrei', 'Andrew', 'Jonah', 'Paul']);
+        }
+      };
+    },
+    addPersonToDay: function(args) {
+      var d, date, day, month, person, year;
+      if (args == null) {
+        args = {};
+      }
+      year = args.year, month = args.month, day = args.day, person = args.person;
+      if (year instanceof Date) {
+        day = year.getDate();
+        month = year.getMonth() + 1;
+        year = year.getFullYear();
+      }
+      date = new Date(year, month - 1, day);
+      d = $q.defer();
+      data.then(function(response) {
+        response[date.toDateString()][person.name] = {
+          name: person.name,
+          times: [
+            {
+              start: 10,
+              end: 11
+            }
+          ]
+        };
+        return d.resolve();
+      });
+      return d.promise;
     }
   };
   return ret;

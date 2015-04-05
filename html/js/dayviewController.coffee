@@ -63,21 +63,17 @@ timeviewController = ($scope, $routeParams, dataService) ->
     $scope.formatName = formatName
 
     $scope.hours = createHourList(START_TIME, END_TIME)
-    console.log $scope.people
-    console.log 'route params', $routeParams
 
     updatePeople = ->
         dataService.get($routeParams.year, $routeParams.month, $routeParams.day)
         .then (dayData) ->
             $scope.people = dayData
-            console.log 'set people to', dayData
     updatePeople()
 
     $scope.possibleNames = []
     dataService.getPossibleNames().then (names) ->
         $scope.possibleNames = names
-        console.log 'got possible names', names
-    
+
     $scope.showNewPersonDialog = false
     $scope.newPerson = ->
         $scope.showNewPersonDialog = true
@@ -89,7 +85,6 @@ timeviewController = ($scope, $routeParams, dataService) ->
             person: {name: person}
         promise.then ->
             updatePeople()
-            console.log "Adding", person
 
     window.xxx = dataService
     window.yyy = $scope
@@ -138,7 +133,6 @@ adjustableRangeDirective = () ->
 
 timeColumnDirective = () ->
     link: (scope, elm, attrs) ->
-        console.log 'linking!!', scope.person
 
 app.controller('TimeViewController', ['$scope', '$routeParams', 'dataService', timeviewController])
 app.directive('adjustableRange', adjustableRangeDirective)

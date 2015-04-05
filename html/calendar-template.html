@@ -1,11 +1,11 @@
 
 <div ng-controller="Calendar" class="container">
   <input type="number" ng-model="monthNum"/>
-  <h1 id="month">{{ month() }} {{ monthNum }} </h1>
+  <h1 id="month">{{ monthName() }} {{ monthNum }} </h1>
   <table year-num="yearNum" month-num="monthNum" class="calendar-view">
     <tr id="week{{$index + 1}}" ng-repeat="week in displayDays">
       <td ng-repeat="day in week" class="day">
-        <div ng-click="showDay([yearNum, monthNum, day.date])">
+        <div ng-click="showDay(day.jsDate)">
           <calendar-day-widget day="day"></calendar-day-widget>
           <!--p(class='dateNum') {{day.date}}-->
           <!--p(ng-repeat='person in day.data') {{ person.name }}-->

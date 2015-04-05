@@ -1,10 +1,10 @@
 div(class='container', ng-controller='Calendar')
     input(type="number", ng-model="monthNum")
-    h1(id="month")= "{{ month() }} {{ monthNum }} "
+    h1(id="month")= "{{ monthName() }} {{ monthNum }} "
     table(class='calendar-view', year-num="yearNum", month-num="monthNum" )
         tr( id='week{{$index + 1}}', ng-repeat='week in displayDays' )
             td(class='day', ng-repeat='day in week')
-                div(ng-click="showDay([yearNum, monthNum, day.date])")
+                div(ng-click="showDay(day.jsDate)")
                     calendar-day-widget(day="day")
                     //p(class='dateNum') {{day.date}}
                     //p(ng-repeat='person in day.data') {{ person.name }}

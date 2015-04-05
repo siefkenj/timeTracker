@@ -112,19 +112,15 @@ timeviewController = function($scope, $routeParams, dataService) {
   $scope.timeRangeToClassName = timeRangeToClassName;
   $scope.formatName = formatName;
   $scope.hours = createHourList(START_TIME, END_TIME);
-  console.log($scope.people);
-  console.log('route params', $routeParams);
   updatePeople = function() {
     return dataService.get($routeParams.year, $routeParams.month, $routeParams.day).then(function(dayData) {
-      $scope.people = dayData;
-      return console.log('set people to', dayData);
+      return $scope.people = dayData;
     });
   };
   updatePeople();
   $scope.possibleNames = [];
   dataService.getPossibleNames().then(function(names) {
-    $scope.possibleNames = names;
-    return console.log('got possible names', names);
+    return $scope.possibleNames = names;
   });
   $scope.showNewPersonDialog = false;
   $scope.newPerson = function() {
@@ -141,8 +137,7 @@ timeviewController = function($scope, $routeParams, dataService) {
       }
     });
     return promise.then(function() {
-      updatePeople();
-      return console.log("Adding", person);
+      return updatePeople();
     });
   };
   window.xxx = dataService;
@@ -205,9 +200,7 @@ adjustableRangeDirective = function() {
 
 timeColumnDirective = function() {
   return {
-    link: function(scope, elm, attrs) {
-      return console.log('linking!!', scope.person);
-    }
+    link: function(scope, elm, attrs) {}
   };
 };
 

@@ -24,13 +24,14 @@ app = angular.module('App', ['ngRoute', 'calendarControllers', 'dayviewControlle
 mainController = function($scope, $routeParams, $location) {
   $scope.showCalendar = function() {
     $location.url('/calendar');
-    console.log('cal');
   };
   $scope.showDay = function(date) {
-    $location.url("/day/" + date[0] + "/" + (date[1] + 1) + "/" + date[2]);
-    console.log('day', date);
+    var day, month, year;
+    day = date.getDate();
+    month = date.getMonth() + 1;
+    year = date.getFullYear();
+    $location.url("/day/" + year + "/" + month + "/" + day);
   };
-  console.log($routeParams);
   $scope.abc = $routeParams.id || "default";
 };
 
@@ -105,6 +106,9 @@ app.factory('dataService', ['$http', '$q', dataService]);
 app.config([
   '$routeProvider', function($routeProvider) {
     return $routeProvider.when('/calendar', {
+      templateUrl: 'calendar-template.html',
+      controller: 'Calendar'
+    }).when('/calendar/:year/:month', {
       templateUrl: 'calendar-template.html',
       controller: 'Calendar'
     }).when('/day', {

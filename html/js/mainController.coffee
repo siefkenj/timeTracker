@@ -24,14 +24,14 @@ mainController = ($scope, $routeParams, $location) ->
 
     $scope.showCalendar = ->
         $location.url('/calendar')
-        console.log 'cal'
         return
     $scope.showDay = (date) ->
-        $location.url("/day/#{date[0]}/#{date[1]+1}/#{date[2]}")
-        console.log 'day', date
+        day = date.getDate()
+        month = date.getMonth() + 1
+        year = date.getFullYear()
+        $location.url("/day/#{year}/#{month}/#{day}")
         return
 
-    console.log $routeParams
     $scope.abc = $routeParams.id || "default"
 
     # set up even listeners to see if we've clicked
@@ -50,7 +50,7 @@ dataService = ($http, $q) ->
         deferred.reject(response)
     $http.get("js/test-hangout-data.json").success(success).error(failure)
     data = deferred.promise
-        
+
     ret =
         get: (year, month, day) ->
             if year instanceof Date
@@ -77,7 +77,7 @@ dataService = ($http, $q) ->
                 month = year.getMonth() + 1
                 year = year.getFullYear()
             date = new Date(year, month - 1, day)
-            
+
             # return a promise that resolves when the person
             # has been successfully added
             d = $q.defer()
@@ -90,7 +90,7 @@ dataService = ($http, $q) ->
                 d.resolve()
             return d.promise
 
-            
+
     return ret
 
 app.factory('dataService', ['$http', '$q', dataService])
@@ -98,6 +98,7 @@ app.factory('dataService', ['$http', '$q', dataService])
 app.config(['$routeProvider',
     ($routeProvider) ->
         $routeProvider.when('/calendar', {templateUrl: 'calendar-template.html', controller: 'Calendar'})
+            .when('/calendar/:year/:month', {templateUrl: 'calendar-template.html', controller: 'Calendar'})
             .when('/day', {templateUrl: 'dayview-template.html', controller: 'TimeViewController'})
             .when('/day/:year/:month/:day', {templateUrl: 'dayview-template.html', controller: 'TimeViewController'})
             .otherwise({redirectTo: '/calendar'})

@@ -1,0 +1,10 @@
+// template for an adjustable hour widget.  It has a starting hour and an ending hour
+// that can be adjusted up and down.
+
+div(class="person-day-new-person-container")
+    h2="Add a person"
+    select(ng-model="newName" ng-options="name for name in possibleNames")
+    
+    button(ng-click="addPersonClick(newName)")="Add"
+    button(ng-click="cancel()")="Cancel"
+

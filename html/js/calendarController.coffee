@@ -41,11 +41,12 @@ setupMonth = (displayMonth, dataService) ->
 
 app = angular.module('calendarControllers', [])
 
-calendarController = ($scope, $http, dataService) ->
+calendarController = ($scope, $http, dataService, $routeParams) ->
     # the calendar defaults to show the current month
     now = new Date()
-    $scope.monthNum = now.getMonth()
-    $scope.yearNum = now.getFullYear()
+    console.log $routeParams.month, $routeParams.year
+    $scope.monthNum = if $routeParams.month then ($routeParams.month - 1)|0 else now.getMonth()
+    $scope.yearNum = if $routeParams.year then $routeParams.year|0 else now.getFullYear()
 
     # make the text name visible to the controller
     $scope.monthName = ->
@@ -63,7 +64,7 @@ calendarController = ($scope, $http, dataService) ->
         )
     return
 
-app.controller('Calendar', ['$scope', '$http', 'dataService', calendarController])
+app.controller('Calendar', ['$scope', '$http', 'dataService', '$routeParams', calendarController])
 
 calendarDayWidget = ->
     templateUrl: 'templates/calendar_day_widget.html'

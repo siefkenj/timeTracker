@@ -61,11 +61,12 @@ setupMonth = function(displayMonth, dataService) {
 
 app = angular.module('calendarControllers', []);
 
-calendarController = function($scope, $http, dataService) {
+calendarController = function($scope, $http, dataService, $routeParams) {
   var now;
   now = new Date();
-  $scope.monthNum = now.getMonth();
-  $scope.yearNum = now.getFullYear();
+  console.log($routeParams.month, $routeParams.year);
+  $scope.monthNum = $routeParams.month ? ($routeParams.month - 1) | 0 : now.getMonth();
+  $scope.yearNum = $routeParams.year ? $routeParams.year | 0 : now.getFullYear();
   $scope.monthName = function() {
     var date, locale;
     locale = 'en-us';
@@ -79,7 +80,7 @@ calendarController = function($scope, $http, dataService) {
   });
 };
 
-app.controller('Calendar', ['$scope', '$http', 'dataService', calendarController]);
+app.controller('Calendar', ['$scope', '$http', 'dataService', '$routeParams', calendarController]);
 
 calendarDayWidget = function() {
   return {

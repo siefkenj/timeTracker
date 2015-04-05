@@ -66,12 +66,31 @@ timeviewController = ($scope, $routeParams, dataService) ->
     console.log $scope.people
     console.log 'route params', $routeParams
 
-    dataService.get($routeParams.year, $routeParams.month, $routeParams.day)
-    .then (dayData) ->
-        $scope.people = dayData
-        console.log 'set people to', dayData
+    updatePeople = ->
+        dataService.get($routeParams.year, $routeParams.month, $routeParams.day)
+        .then (dayData) ->
+            $scope.people = dayData
+            console.log 'set people to', dayData
+    updatePeople()
 
-    $scope.booger = {start: -1}
+    $scope.possibleNames = []
+    dataService.getPossibleNames().then (names) ->
+        $scope.possibleNames = names
+        console.log 'got possible names', names
+    
+    $scope.showNewPersonDialog = false
+    $scope.newPerson = ->
+        $scope.showNewPersonDialog = true
+    $scope.addPerson = (person) ->
+        promise = dataService.addPersonToDay
+            year: $routeParams.year
+            month: $routeParams.month
+            day: $routeParams.day
+            person: {name: person}
+        promise.then ->
+            updatePeople()
+            console.log "Adding", person
+
     window.xxx = dataService
     window.yyy = $scope
 
@@ -170,3 +189,28 @@ personDayInfoWidget = ->
             $scope.person.times.splice(i, 1)
 
 app.directive('personDayInfoWidget', personDayInfoWidget)
+
+newPersonDialog = ->
+    directiveDefinitionObject =
+        templateUrl: 'templates/new-person-textbased.html'
+        restrict: 'E'
+        #transclude: true
+        scope: {
+            possibleNames: "=possibleNames"
+            addPerson: "=addPerson"
+            showDialog: "=ngShow"
+        }
+        #link: (scope, element, attr) ->
+        #    console.log 'meme', scope, element, attr
+        controller: ($scope) ->
+            $scope.addPersonClick = (newName) ->
+                console.log("you want to add #{newName}")
+                $scope.addPerson?(newName)
+                $scope.showDialog = false
+            $scope.cancel = ->
+                console.log("canceling...")
+                $scope.showDialog = false
+
+    return directiveDefinitionObject
+
+app.directive('newPersonDialog', newPersonDialog)

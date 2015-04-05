@@ -11,12 +11,16 @@ setupMonth = function(displayMonth, calendarData, dataService) {
     return calendarData[(new Date(year, month, day)).toDateString()];
   };
   makeLastMonthDate = function(day) {
-    return {
+    var ret;
+    ret = {
       date: (new Date(year, month - 1, -day)).getDate(),
-      data: dataService.get(year, month - 1, day).then(function(dayData) {
-        return dayData;
-      })
+      data: null
     };
+    dataService.get(year, month, day).then(function(dayData) {
+      return ret.data = dayData;
+    });
+    console.log("sweeeeeeeeeeetttttt", year, month, day, ret.date);
+    return ret;
   };
   makeThisMonthDate = function(day) {
     return {

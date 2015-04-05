@@ -8,10 +8,14 @@ setupMonth = ( displayMonth, calendarData, dataService ) ->
         return calendarData[(new Date(year, month, day)).toDateString()]
 
     makeLastMonthDate = (day) ->
-        date:(new Date( year, month-1, -day )).getDate()
-        data: dataService.get year, month - 1, day
+        ret =
+            date:(new Date( year, month-1, -day )).getDate()
+            data: null
+        dataService.get year, month, day
             .then (dayData) ->
-                dayData
+                ret.data = dayData
+        console.log "sweeeeeeeeeeetttttt", year, month, day, ret.date
+        return ret
 
     makeThisMonthDate = (day) ->
         date:day
@@ -95,6 +99,7 @@ calendarDayWidget = ->
     #link: (scope, element, attr) ->
     #    console.log 'meme', scope, element, attr
     controller: ($scope) ->
+        #$scope.$watch( 'day',
         console.log 'here is the calendar data', $scope.day
 
 app.directive('calendarDayWidget', calendarDayWidget)

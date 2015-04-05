@@ -1,5 +1,6 @@
 
-<div id="container" ng-controller="Calendar">
+<div id="container">
+  <p>{{ day.date}}</p>
   <div ng-repeat="person in day.data">
     <p>{{ person.name }}</p>
   </div>

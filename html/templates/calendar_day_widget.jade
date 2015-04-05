@@ -1,3 +1,4 @@
-div(id="container", ng-controller="Calendar")
+div(id="container")
+    p= "{{ day.date}}"
     div(ng-repeat="person in day.data")
         p= "{{ person.name }}"

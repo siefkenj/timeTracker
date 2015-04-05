@@ -1,7 +1,7 @@
 div(class='container', ng-controller='Calendar')
     input(type="number", ng-model="monthNum")
     h1(id="month")= "{{ month() }} {{ monthNum }} "
-    table(class='calendar-view', month-view, year-num="yearNum", month-num="monthNum" )
+    table(class='calendar-view', year-num="yearNum", month-num="monthNum" )
         tr( id='week{{$index + 1}}', ng-repeat='week in displayDays' )
             td(class='day', ng-repeat='day in week')
                 div(ng-click="showDay([yearNum, monthNum, day.date])")

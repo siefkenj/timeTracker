@@ -3,11 +3,20 @@
 /*
  * Helper Functions
  */
-var END_TIME, START_TIME, app, dataService, mainController;
+var END_TIME, START_TIME, app, dataService, extend, mainController, populateDatabase;
 
 START_TIME = -2;
 
 END_TIME = 24 + 3;
+
+extend = function(a, b) {
+  var k, v;
+  for (k in b) {
+    v = b[k];
+    a[k] = v;
+  }
+  return a;
+};
 
 
 /*
@@ -37,8 +46,21 @@ mainController = function($scope, $routeParams, $location) {
 
 app.controller('MainController', ['$scope', '$routeParams', '$location', mainController]);
 
+populateDatabase = function(collection, data) {
+  var formattedData, k, v;
+  formattedData = [];
+  for (k in data) {
+    v = data[k];
+    formattedData.push({
+      _id: k,
+      data: v
+    });
+  }
+  collection.setData(formattedData);
+};
+
 dataService = function($http, $q) {
-  var data, deferred, failure, ret, success;
+  var collection, data, db, dbDeferred, deferred, failure, ret, success;
   deferred = $q.defer();
   success = function(response) {
     return deferred.resolve(response);
@@ -48,30 +70,81 @@ dataService = function($http, $q) {
   };
   $http.get("js/test-hangout-data.json").success(success).error(failure);
   data = deferred.promise;
+  dbDeferred = $q.defer();
+  db = new ForerunnerDB();
+  collection = db.collection('sample');
+  collection.load(function(err) {
+    return dbDeferred.resolve();
+  });
+  if (collection.find().length === 0) {
+    data.then(function(response) {
+      populateDatabase(collection, response);
+      return collection.save();
+    });
+  }
   ret = {
-    get: function(year, month, day) {
-      var d, date;
+    get: (function(_this) {
+      return function(year, month, day, giveRecord) {
+        var d, date;
+        if (giveRecord == null) {
+          giveRecord = false;
+        }
+        if (year instanceof Date) {
+          day = year.getDate();
+          month = year.getMonth() + 1;
+          year = year.getFullYear();
+        }
+        date = new Date(year, month - 1, day);
+        d = $q.defer();
+        dbDeferred.promise.then(function() {
+          var info;
+          info = collection.findById(date.toDateString()) || {};
+          console.log('info', info, date.toDateString());
+          if (giveRecord) {
+            return d.resolve(info);
+          } else {
+            return d.resolve(info.data);
+          }
+        });
+        return d.promise;
+      };
+    })(this),
+    setDayData: function(args) {
+      var d, date, day, month, oldRecord, year;
+      if (args == null) {
+        args = {};
+      }
+      year = args.year, month = args.month, day = args.day, date = args.date, data = args.data;
       if (year instanceof Date) {
         day = year.getDate();
         month = year.getMonth() + 1;
         year = year.getFullYear();
       }
-      date = new Date(year, month - 1, day);
+      date = date || new Date(year, month - 1, day);
       d = $q.defer();
-      data.then(function(response) {
-        return d.resolve(response[date.toDateString()] || {});
+      oldRecord = this.get(date, null, null, true);
+      oldRecord.then(function(response) {
+        response.data = data;
+        response._id = response._id || date.toDateString();
+        collection.updateById(response._id, {
+          data: response.data
+        });
+        d.resolve();
+        return collection.save();
       });
       return d.promise;
     },
-    getPossibleNames: function() {
-      return {
-        then: function(f) {
-          return f(['Andrei', 'Andrew', 'Jonah', 'Paul']);
-        }
+    getPossibleNames: (function(_this) {
+      return function() {
+        return {
+          then: function(f) {
+            return f(['Andrei', 'Andrew', 'Jonah', 'Paul']);
+          }
+        };
       };
-    },
+    })(this),
     addPersonToDay: function(args) {
-      var d, date, day, month, person, year;
+      var d, date, day, month, oldRecord, person, year;
       if (args == null) {
         args = {};
       }
@@ -83,8 +156,9 @@ dataService = function($http, $q) {
       }
       date = new Date(year, month - 1, day);
       d = $q.defer();
-      data.then(function(response) {
-        response[date.toDateString()][person.name] = {
+      oldRecord = this.get(date, null, null, true);
+      oldRecord.then(function(response) {
+        response.data[person.name] = {
           name: person.name,
           times: [
             {
@@ -93,11 +167,17 @@ dataService = function($http, $q) {
             }
           ]
         };
-        return d.resolve();
+        response._id = response._id || date.toDateString();
+        collection.updateById(response._id, {
+          data: response.data
+        });
+        d.resolve();
+        return collection.save();
       });
       return d.promise;
     }
   };
+  window.aaa = ret;
   return ret;
 };
 

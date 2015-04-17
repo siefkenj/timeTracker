@@ -86,15 +86,14 @@ timeviewController = ($scope, $routeParams, dataService) ->
         promise.then ->
             updatePeople()
 
-    window.xxx = dataService
-    window.yyy = $scope
+    dataChanged = ->
+        dataService.setDayData
+            year: $routeParams.year
+            month: $routeParams.month
+            day: $routeParams.day
+            data: $scope.people
 
-    $scope.pp =
-        name: 'Tomas'
-        timespans: [{start: 4, end: 10}, {start: 2, end: 6}]
-
-    # set up even listeners to see if we've clicked
-    # and want to add a new time for someone
+    $scope.$watch('people', dataChanged, true)
 
     return
 

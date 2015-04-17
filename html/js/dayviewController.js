@@ -107,7 +107,7 @@ app = angular.module('dayviewControllers', []);
  */
 
 timeviewController = function($scope, $routeParams, dataService) {
-  var updatePeople;
+  var dataChanged, updatePeople;
   $scope.getTotalHours = getTotalHours;
   $scope.timeRangeToClassName = timeRangeToClassName;
   $scope.formatName = formatName;
@@ -140,20 +140,15 @@ timeviewController = function($scope, $routeParams, dataService) {
       return updatePeople();
     });
   };
-  window.xxx = dataService;
-  window.yyy = $scope;
-  $scope.pp = {
-    name: 'Tomas',
-    timespans: [
-      {
-        start: 4,
-        end: 10
-      }, {
-        start: 2,
-        end: 6
-      }
-    ]
+  dataChanged = function() {
+    return dataService.setDayData({
+      year: $routeParams.year,
+      month: $routeParams.month,
+      day: $routeParams.day,
+      data: $scope.people
+    });
   };
+  $scope.$watch('people', dataChanged, true);
 };
 
 adjustableRangeDirective = function() {

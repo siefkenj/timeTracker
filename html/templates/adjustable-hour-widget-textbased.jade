@@ -4,10 +4,8 @@
 div(class="adjustable-hour-container")
     | Start:
     input(class="start-hour", ng-model="startHour")
-    button(ng-click="increment('start', '-')")="-"
-    button(ng-click="increment('start', '+')")="+"
+    <button class="dec" ng-click="increment('start', '-')">-</button><button class="inc" ng-click="increment('start', '+')">+</button>
     | End: 
     input(class="start-hour", ng-model="endHour")
-    button(ng-click="increment('end', '-')")="-"
-    button(ng-click="increment('end', '+')")="+"
+    <button class="dec" ng-click="increment('end', '-')">-</button><button class="inc" ng-click="increment('end', '+')">+</button>
     span()=" ({{ endHour - startHour }} hours)"

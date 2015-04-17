@@ -449,3 +449,38 @@
 .column .time.not-today {
   background: #808080;
 }
+.person-day-info-container {
+  margin-top: 5px;
+  margin-bottom: 5px;
+}
+.person-day-info-container .name {
+  font-weight: bold;
+  padding: 2px;
+  font-size: larger;
+}
+.person-day-info-container .dec,
+.person-day-info-container .inc {
+  margin: 0px;
+  display: inline-block;
+  border: 1px solid #000;
+  background: #ffe698;
+  width: 2em;
+}
+.person-day-info-container .dec {
+  border-top-left-radius: 7px;
+  border-bottom-left-radius: 7px;
+}
+.person-day-info-container .inc {
+  border-top-right-radius: 7px;
+  border-bottom-right-radius: 7px;
+  border-left: none;
+}
+.adjustable-hour-container input {
+  width: 3em;
+  margin-right: 3px;
+  margin-left: 3px;
+}
+.adjustable-hour-container {
+  display: inline-block;
+  margin-left: 2em;
+}

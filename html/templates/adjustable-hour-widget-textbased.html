@@ -2,10 +2,7 @@
 <!-- template for an adjustable hour widget.  It has a starting hour and an ending hour-->
 <!-- that can be adjusted up and down.-->
 <div class="adjustable-hour-container">Start:
-  <input ng-model="startHour" class="start-hour"/>
-  <button ng-click="increment('start', '-')">-</button>
-  <button ng-click="increment('start', '+')">+</button>End: 
-  <input ng-model="endHour" class="start-hour"/>
-  <button ng-click="increment('end', '-')">-</button>
-  <button ng-click="increment('end', '+')">+</button><span> ({{ endHour - startHour }} hours)</span>
+  <input ng-model="startHour" class="start-hour"/><button class="dec" ng-click="increment('start', '-')">-</button><button class="inc" ng-click="increment('start', '+')">+</button>
+  End: 
+  <input ng-model="endHour" class="start-hour"/><button class="dec" ng-click="increment('end', '-')">-</button><button class="inc" ng-click="increment('end', '+')">+</button><span> ({{ endHour - startHour }} hours)</span>
 </div>

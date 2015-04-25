@@ -2,6 +2,7 @@ extends frame
 
 block extraCSS
     link(rel="stylesheet", href="css/dayview.css")
+    link(rel="stylesheet", href="css/hourspan.css")
     link(rel='stylesheet', href='css/calendar.css')
 
 block controller
@@ -10,5 +11,5 @@ block controller
     script(src='js/dayviewController.js')
 
 block content
-    div(class="view-container")="You've requested the '{{abc}}' page."
+    div(class="view-container")
         div(class="view-frame", ng-view)="view"

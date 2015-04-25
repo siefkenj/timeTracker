@@ -5,6 +5,6 @@ div(class="person-day-info-container")
     span(class="name")="{{person.name}}"
     span(class="total-hours")="({{totalHours}} hours total)"
     div(ng-repeat="timespan in person.times")
-        adjustable-hour-widget(start-hour="timespan.start" end-hour="timespan.end")
+        adjustable-hour-widget-textbased(start-hour="timespan.start" end-hour="timespan.end")
         button(ng-click="removeTimespan($index)")="Remove"
     button(ng-click="newTimespan()")="New"

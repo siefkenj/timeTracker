@@ -1,0 +1,12 @@
+// template for an adjustable hour widget.  It has a starting hour and an ending hour
+// that can be adjusted up and down.
+
+// build up the column
+div(class="name")
+    span(class="name-text")="{{person.name}}"
+    span(class="total-hours")=" ({{totalHours}})"
+div(ng-repeat="hour in hours" class="hours {{ hour.thisday }}", hour="{{hour.time}}", ng-click="newTime(hour.time)" )
+
+// populate the column with each instance of a timespan
+div(ng-repeat="timespan in person.times")
+    adjustable-hour-widget(start-hour="timespan.start", end-hour="timespan.end", offsets="offsets")

@@ -3,28 +3,8 @@
 /*
  * Helper Functions
  */
-var END_TIME, START_TIME, adjustableHourWidget, adjustableRangeDirective, app, createHourList, formatName, getTotalHours, newPersonDialog, personDayInfoWidget, randRange, randSample, roundToHalf, timeColumnDirective, timeRangeToClassName, timeviewController,
+var END_TIME, START_TIME, adjustableHourWidget, adjustableHourWidgetTextbased, app, createHourList, getTotalHours, newPersonDialog, personDayInfoWidget, personDayInfoWidgetTextbased, roundToHalf, timeviewController,
   modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
-
-randRange = function(start, end) {
-  if (start == null) {
-    start = 0;
-  }
-  if (end == null) {
-    end = 5;
-  }
-  return start + Math.floor(Math.random() * (end - start + 1));
-};
-
-randSample = function(array, samples) {
-  var arrayCpy, i, j, ref, ret;
-  arrayCpy = array.slice();
-  ret = [];
-  for (i = j = 0, ref = samples; 0 <= ref ? j < ref : j > ref; i = 0 <= ref ? ++j : --j) {
-    ret = ret.concat(arrayCpy.splice(randRange(0, arrayCpy.length - 1), 1));
-  }
-  return ret;
-};
 
 roundToHalf = function(t) {
   return Math.round(2 * t) / 2;
@@ -54,7 +34,8 @@ createHourList = function(start, end) {
     for (i = j = ref = start, ref1 = end; ref <= ref1 ? j < ref1 : j > ref1; i = ref <= ref1 ? ++j : --j) {
       results.push({
         thisday: today(i),
-        hour: hour(i)
+        hour: hour(i),
+        time: i
       });
     }
     return results;
@@ -62,32 +43,14 @@ createHourList = function(start, end) {
 };
 
 getTotalHours = function(p) {
-  var j, len1, ref, t, total;
+  var j, len, ref, t, total;
   total = 0;
   ref = p.times;
-  for (j = 0, len1 = ref.length; j < len1; j++) {
+  for (j = 0, len = ref.length; j < len; j++) {
     t = ref[j];
     total += t.end - t.start;
   }
   return total;
-};
-
-timeRangeToClassName = function(t) {
-  var formatNum, len, start;
-  formatNum = function(x) {
-    if (modulo(x, 1) > 0) {
-      return (Math.floor(x)) + "-5";
-    } else {
-      return (Math.floor(x)) + "-0";
-    }
-  };
-  len = roundToHalf(t.end - t.start);
-  start = roundToHalf(t.start);
-  return "length-" + (formatNum(len)) + " start-" + (formatNum(start));
-};
-
-formatName = function(person) {
-  return person.name + " (" + (getTotalHours(person)) + ")";
 };
 
 START_TIME = -2;
@@ -109,8 +72,6 @@ app = angular.module('dayviewControllers', []);
 timeviewController = function($scope, $routeParams, dataService) {
   var dataChanged, updatePeople;
   $scope.getTotalHours = getTotalHours;
-  $scope.timeRangeToClassName = timeRangeToClassName;
-  $scope.formatName = formatName;
   $scope.hours = createHourList(START_TIME, END_TIME);
   updatePeople = function() {
     return dataService.get($routeParams.year, $routeParams.month, $routeParams.day).then(function(dayData) {
@@ -151,86 +112,122 @@ timeviewController = function($scope, $routeParams, dataService) {
   $scope.$watch('people', dataChanged, true);
 };
 
-adjustableRangeDirective = function() {
-  return {
-    link: function(scope, elm, attrs) {
-      var oldHourChange, origTimeEnd, origTimeStart, startY;
-      oldHourChange = null;
-      startY = null;
-      origTimeStart = scope.time.start;
-      origTimeEnd = scope.time.end;
-      interact($(elm).find('.top-handle')[0]).draggable({
-        max: Infinity
-      }).on('dragstart', function(evt) {
-        startY = evt.pageY;
-        return origTimeStart = scope.time.start;
-      }).on('dragmove', function(evt) {
-        var delta, hourChange;
-        delta = startY - evt.pageY;
-        hourChange = roundToHalf(delta / 23);
-        if (hourChange !== oldHourChange) {
-          oldHourChange = hourChange;
-          scope.time.start = origTimeStart - hourChange;
-          return scope.$apply();
-        }
-      });
-      return interact($(elm).find('.bottom-handle')[0]).draggable({
-        max: Infinity
-      }).on('dragstart', function(evt) {
-        startY = evt.pageY;
-        return origTimeEnd = scope.time.end;
-      }).on('dragmove', function(evt) {
-        var delta, hourChange;
-        delta = startY - evt.pageY;
-        hourChange = roundToHalf(delta / 23);
-        if (hourChange !== oldHourChange) {
-          oldHourChange = hourChange;
-          scope.time.end = origTimeEnd - hourChange;
-          return scope.$apply();
-        }
-      });
-    }
-  };
-};
-
-timeColumnDirective = function() {
-  return {
-    link: function(scope, elm, attrs) {}
-  };
-};
-
 app.controller('TimeViewController', ['$scope', '$routeParams', 'dataService', timeviewController]);
-
-app.directive('adjustableRange', adjustableRangeDirective);
-
-app.directive('timeColumn', adjustableRangeDirective);
 
 adjustableHourWidget = function() {
   return {
-    templateUrl: 'templates/adjustable-hour-widget-textbased.html',
+    templateUrl: 'templates/adjustable-hour-widget.html',
     restrict: 'E',
     scope: {
       startHour: '=startHour',
-      endHour: '=endHour'
+      endHour: '=endHour',
+      offsets: '=offsets'
     },
-    link: function(scope, element, attr) {
-      return console.log('meme', scope, element, attr);
+    link: function(scope, elm, attr) {
+      var bottom, bounds, hourHeigh, oldHourChange, origTimeEnd, origTimeStart, ref, startY, top;
+      oldHourChange = null;
+      startY = null;
+      origTimeStart = scope.startHour;
+      origTimeEnd = scope.endHour;
+      hourHeigh = ((ref = scope.$parent.offsets) != null ? ref.height : void 0) || 25;
+      bounds = scope.$parent.computeValidTimeRange((origTimeStart + origTimeEnd) / 2, {
+        start: origTimeStart,
+        end: origTimeEnd
+      });
+      top = interact($(elm).find('.top-time')[0]);
+      top.draggable({
+        max: Infinity
+      });
+      top.on('dragstart', function(evt) {
+        startY = evt.pageY;
+        origTimeStart = scope.startHour;
+        origTimeEnd = scope.endHour;
+        return bounds = scope.$parent.computeValidTimeRange((origTimeStart + origTimeEnd) / 2, {
+          start: origTimeStart,
+          end: origTimeEnd
+        });
+      });
+      top.on('dragmove', function(evt) {
+        var delta, hourChange, startHour;
+        delta = startY - evt.pageY;
+        hourChange = roundToHalf(delta / hourHeigh);
+        if (hourChange !== oldHourChange) {
+          oldHourChange = hourChange;
+          startHour = origTimeStart - hourChange;
+          startHour = Math.max(startHour, bounds.start);
+          startHour = Math.min(startHour, origTimeEnd - .5);
+          scope.startHour = startHour;
+          return scope.$apply();
+        }
+      });
+      bottom = interact($(elm).find('.bottom-time')[0]);
+      bottom.draggable({
+        max: Infinity
+      });
+      bottom.on('dragstart', function(evt) {
+        startY = evt.pageY;
+        origTimeEnd = scope.endHour;
+        origTimeStart = scope.startHour;
+        return bounds = scope.$parent.computeValidTimeRange((origTimeStart + origTimeEnd) / 2, {
+          start: origTimeStart,
+          end: origTimeEnd
+        });
+      });
+      bottom.on('dragmove', function(evt) {
+        var delta, endHour, hourChange;
+        delta = startY - evt.pageY;
+        hourChange = roundToHalf(delta / hourHeigh);
+        if (hourChange !== oldHourChange) {
+          oldHourChange = hourChange;
+          endHour = origTimeEnd - hourChange;
+          endHour = Math.min(endHour, bounds.end);
+          endHour = Math.max(endHour, origTimeStart + .5);
+          scope.endHour = endHour;
+          return scope.$apply();
+        }
+      });
+      return scope.container = elm.find('.hourspan-container');
     },
     controller: function($scope) {
-      console.log('das controller', $scope);
-      return $scope.increment = function(which, direction) {
-        if (which === 'start' && direction === '+') {
-          $scope.startHour += .5;
+      $scope.cssTime = function(hour) {
+        var half;
+        half = hour % 1 >= .5 ? 5 : 0;
+        hour = Math.floor(hour);
+        return hour + "-" + half;
+      };
+      $scope.formatTime = function(hour) {
+        var ampm, minute;
+        minute = Math.floor((hour % 1) * 60);
+        minute = ("00" + minute).slice(-2);
+        ampm = hour < 0 || hour >= 12 ? "pm" : "am";
+        hour = modulo(Math.floor(hour), 12);
+        if (hour === 0) {
+          hour = 12;
         }
-        if (which === 'start' && direction === '-') {
-          $scope.startHour -= .5;
+        return hour + ":" + minute + ampm;
+      };
+      $scope.$watchGroup(['startHour', 'endHour'], function() {
+        var bottom, height, offsets, top;
+        offsets = $scope.$parent.computeHourOffsets();
+        top = offsets[$scope.startHour];
+        bottom = offsets.totalHeight - offsets[$scope.endHour];
+        height = offsets[$scope.endHour] - top;
+        $scope.container.css({
+          top: top,
+          bottom: bottom,
+          height: height
+        });
+        if (height < 100) {
+          return $scope.container.addClass('compact-vert');
+        } else {
+          return $scope.container.removeClass('compact-vert');
         }
-        if (which === 'end' && direction === '+') {
-          $scope.endHour += .5;
-        }
-        if (which === 'end' && direction === '-') {
-          return $scope.endHour -= .5;
-        }
+      });
+      return $scope.deleteClicked = function() {
+        return $scope.$parent.removeTimeRange({
+          start: $scope.startHour,
+          end: $scope.endHour
+        });
       };
     }
   };
@@ -240,22 +237,51 @@ app.directive('adjustableHourWidget', adjustableHourWidget);
 
 personDayInfoWidget = function() {
   return {
-    templateUrl: 'templates/person-day-info-textbased.html',
+    templateUrl: 'templates/person-day-info.html',
     restrict: 'E',
     scope: {
-      person: "=person"
+      person: "=person",
+      hours: "=hours"
+    },
+    link: function(scope, element, attr) {
+      return scope.container = element;
     },
     controller: function($scope) {
       var setTotalHours;
       setTotalHours = function() {
-        var j, len1, ref, timespan, total;
+        var j, len, ref, timespan, total;
         total = 0;
         ref = $scope.person.times;
-        for (j = 0, len1 = ref.length; j < len1; j++) {
+        for (j = 0, len = ref.length; j < len; j++) {
           timespan = ref[j];
           total += timespan.end - timespan.start;
         }
         return $scope.totalHours = total;
+      };
+      $scope.offsets = {};
+      $scope.computeHourOffsets = function() {
+        var endTime, height, i, j, ref, ref1, ref2, startTime, tops, x;
+        tops = (function() {
+          var j, len, ref, results;
+          ref = $scope.container.find('.hours');
+          results = [];
+          for (j = 0, len = ref.length; j < len; j++) {
+            x = ref[j];
+            results.push(x.offsetTop);
+          }
+          return results;
+        })();
+        height = ((ref = $scope.container.find('.hours')[0]) != null ? ref.offsetHeight : void 0) || 0;
+        startTime = -2;
+        endTime = startTime + tops.length;
+        $scope.offsets = {};
+        for (i = j = ref1 = startTime, ref2 = endTime; ref1 <= ref2 ? j <= ref2 : j >= ref2; i = ref1 <= ref2 ? ++j : --j) {
+          $scope.offsets[i] = tops[i - startTime];
+          $scope.offsets[i + .5] = tops[i - startTime] + height / 2;
+        }
+        $scope.offsets.height = height;
+        $scope.offsets.totalHeight = tops[tops.length - 1] + height;
+        return $scope.offsets;
       };
       $scope.$watch('person.times', setTotalHours, true);
       $scope.newTimespan = function() {
@@ -264,9 +290,84 @@ personDayInfoWidget = function() {
           end: 11
         });
       };
-      return $scope.removeTimespan = function(i) {
+      $scope.removeTimespan = function(i) {
         return $scope.person.times.splice(i, 1);
       };
+      $scope.computeValidTimeRange = function(initTime, ignoreRange) {
+        var end, i, start, useableIntervals;
+        if (ignoreRange == null) {
+          ignoreRange = {};
+        }
+        useableIntervals = (function() {
+          var j, len, ref, results;
+          ref = $scope.person.times;
+          results = [];
+          for (j = 0, len = ref.length; j < len; j++) {
+            i = ref[j];
+            if (i.start !== ignoreRange.start && i.end !== ignoreRange.end) {
+              results.push(i);
+            }
+          }
+          return results;
+        })();
+        end = Math.min.apply(null, (function() {
+          var j, len, results;
+          results = [];
+          for (j = 0, len = useableIntervals.length; j < len; j++) {
+            i = useableIntervals[j];
+            if (i.start >= initTime) {
+              results.push(i.start);
+            }
+          }
+          return results;
+        })());
+        end = Math.min(26, end);
+        start = Math.max.apply(null, (function() {
+          var j, len, results;
+          results = [];
+          for (j = 0, len = useableIntervals.length; j < len; j++) {
+            i = useableIntervals[j];
+            if (i.end <= initTime) {
+              results.push(i.end);
+            }
+          }
+          return results;
+        })());
+        start = Math.max(-3, start);
+        return {
+          start: start,
+          end: end
+        };
+      };
+      $scope.removeTimeRange = function(timeRange) {
+        var i, j, len, r, ref, removeIndex;
+        ref = $scope.person.times;
+        for (i = j = 0, len = ref.length; j < len; i = ++j) {
+          r = ref[i];
+          if (r.start === timeRange.start && r.end === timeRange.end) {
+            removeIndex = i;
+          }
+        }
+        if (removeIndex != null) {
+          $scope.person.times.splice(removeIndex, 1);
+        }
+      };
+      $scope.newTime = function(hour, defaultDuration) {
+        var newRange, range;
+        if (defaultDuration == null) {
+          defaultDuration = 2;
+        }
+        range = $scope.computeValidTimeRange(hour);
+        newRange = {
+          start: hour,
+          end: hour + defaultDuration
+        };
+        newRange.end = Math.min(newRange.end, range.end);
+        newRange.start = newRange.end - defaultDuration;
+        newRange.start = Math.max(newRange.start, range.start);
+        return $scope.person.times.push(newRange);
+      };
+      return window.sss = $scope;
     }
   };
 };
@@ -301,3 +402,72 @@ newPersonDialog = function() {
 };
 
 app.directive('newPersonDialog', newPersonDialog);
+
+
+/*
+ * Textbased widgets
+ */
+
+adjustableHourWidgetTextbased = function() {
+  return {
+    templateUrl: 'templates/adjustable-hour-widget-textbased.html',
+    restrict: 'E',
+    scope: {
+      startHour: '=startHour',
+      endHour: '=endHour'
+    },
+    controller: function($scope) {
+      return $scope.increment = function(which, direction) {
+        if (which === 'start' && direction === '+') {
+          $scope.startHour += .5;
+        }
+        if (which === 'start' && direction === '-') {
+          $scope.startHour -= .5;
+        }
+        if (which === 'end' && direction === '+') {
+          $scope.endHour += .5;
+        }
+        if (which === 'end' && direction === '-') {
+          return $scope.endHour -= .5;
+        }
+      };
+    }
+  };
+};
+
+app.directive('adjustableHourWidgetTextbased', adjustableHourWidgetTextbased);
+
+personDayInfoWidgetTextbased = function() {
+  return {
+    templateUrl: 'templates/person-day-info-textbased.html',
+    restrict: 'E',
+    scope: {
+      person: "=person"
+    },
+    controller: function($scope) {
+      var setTotalHours;
+      setTotalHours = function() {
+        var j, len, ref, timespan, total;
+        total = 0;
+        ref = $scope.person.times;
+        for (j = 0, len = ref.length; j < len; j++) {
+          timespan = ref[j];
+          total += timespan.end - timespan.start;
+        }
+        return $scope.totalHours = total;
+      };
+      $scope.$watch('person.times', setTotalHours, true);
+      $scope.newTimespan = function() {
+        return $scope.person.times.push({
+          start: 10,
+          end: 11
+        });
+      };
+      return $scope.removeTimespan = function(i) {
+        return $scope.person.times.splice(i, 1);
+      };
+    }
+  };
+};
+
+app.directive('personDayInfoWidgetTextbased', personDayInfoWidgetTextbased);

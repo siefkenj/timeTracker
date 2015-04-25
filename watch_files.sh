@@ -11,15 +11,15 @@ compile() {
 	EXTENSION=${FILENAME##*.}
 	if [[ "$EXTENSION" == "coffee" ]]
 	then
-		coffee -bc "$FILENAME"
+		coffee -bc "$FILENAME" &
 	fi
 	if [[ "$EXTENSION" == "styl" ]]
 	then
-		stylus -w "$FILENAME" -u nib
+		stylus -w "$FILENAME" -u nib &
 	fi
 	if [[ "$EXTENSION" == "jade" ]]
 	then
-		jade --pretty "$FILENAME"
+		jade --pretty "$FILENAME" &
 	fi
 }
 

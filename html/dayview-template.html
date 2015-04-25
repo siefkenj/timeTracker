@@ -1,25 +1,13 @@
 
-<div id="container" ng-controller="TimeViewController">hi there
-  <!--adjustable-hour-widget(start-hour="booger.start", end-hour="12")-->
-  <!--person-day-info-widget(person="pp")-->
+<div id="container" ng-controller="TimeViewController">
   <button ng-click="newPerson()">New Person</button>
   <new-person-dialog ng-show="showNewPersonDialog" possible-names="possibleNames" add-person="addPerson"></new-person-dialog>
-  <div ng-repeat="(k, person) in people">
-    <person-day-info-widget person="person"></person-day-info-widget>
-  </div>
-  <div class="hourScrollerHeader">
-    <div class="column hours"></div>
-    <div ng-repeat="(k, person) in people" class="column name">{{formatName(person)}}</div>
-  </div>
-  <div class="hourScroller">
+  <div class="dayview-hours">
     <div class="column hours">
-      <div ng-repeat="hour in hours" class="time {{hour.thisday}}">{{hour.hour}}</div>
+      <div ng-repeat="hour in hours" class="hours {{hour.thisday}}">{{hour.hour}}</div>
     </div>
-    <div ng-repeat="(k, person) in people" person-key="{{k}}" class="column hoursGrid">
-      <div ng-repeat="hour in hours" class="time {{hour.thisday}}"></div>
-      <div ng-repeat="time in person.times" adjustable-range="time" class="hourSpan {{timeRangeToClassName(time)}}">{{time.end-time.start}} hours
-        <div class="top-handle">^^^</div>
-        <div class="bottom-handle">---</div></div>
+    <div ng-repeat="(k, person) in people" class="column hours-grid">
+      <person-day-info-widget person="person" hours="hours"></person-day-info-widget>
     </div>
   </div>
 </div>

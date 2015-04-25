@@ -6,6 +6,7 @@
     <!-- local content-->
     <link href="css/frame.css" rel="stylesheet">
     <link rel="stylesheet" href="css/dayview.css">
+    <link rel="stylesheet" href="css/hourspan.css">
     <link rel="stylesheet" href="css/calendar.css">
     <!-- cdn content-->
     <link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/4.3.0/css/font-awesome.min.css">
@@ -30,8 +31,9 @@
       </div>
     </div>
     <div id="content">
-      <div class="view-container">You've requested the '{{abc}}' page.
-        <div ng-view class="view-frame">view</div></div>
+      <div class="view-container">
+        <div ng-view class="view-frame">view</div>
+      </div>
     </div>
     <div id="footer">
       <div class="left"></div>

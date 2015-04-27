@@ -96,7 +96,6 @@ dataService = ($http, $q) ->
             d = $q.defer()
             dbDeferred.promise.then ()->
                 info = collection.findById(date.toDateString()) || {}
-                console.log 'info', info, date.toDateString()
                 if giveRecord
                     d.resolve(info)
                 else

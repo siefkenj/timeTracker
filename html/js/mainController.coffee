@@ -83,6 +83,20 @@ dataService = ($http, $q) ->
             populateDatabase(collection, response)
             collection.save()
 
+    ###
+    # Returns the list of different people in the database
+    # starting from startDate and working backwards MAX_DAYS
+    # number of days
+    ###
+    MAX_DAYS = 60
+    getProbableNames = (collection, startDate=new Date()) ->
+        people = {}
+        for i in [0...MAX_DAYS]
+            date = new Date(startDate.getFullYear(), startDate.getMonth(), startDate.getDate() - i)
+            info = collection.findById(date.toDateString()) || {data:{}}
+            for name of info.data
+                people[name] = (people[name] || 0) + 1
+        return people
 
     ret =
         get: (year, month, day, giveRecord=false) =>
@@ -127,10 +141,15 @@ dataService = ($http, $q) ->
             return d.promise
 
         getPossibleNames: () =>
-            # simulate a promise for now
-            return {
-                then: (f) -> f(['Andrei', 'Andrew', 'Jonah', 'Paul'])
-            }
+            d = $q.defer()
+            dbDeferred.promise.then ()->
+                names = getProbableNames(collection)
+                # make an array sorted by frequency the names appear
+                ret = Object.keys(names)
+                ret.sort( (a,b) -> return names[b] - names[a] )
+                d.resolve(ret)
+            return d.promise
+
         addPersonToDay: (args={}) ->
 
             {year, month, day, person} = args
@@ -157,7 +176,6 @@ dataService = ($http, $q) ->
 
             return d.promise
 
-    window.aaa = ret
     return ret
 
 app.factory('dataService', ['$http', '$q', dataService])

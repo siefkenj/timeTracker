@@ -34,6 +34,7 @@ app = angular.module('dayviewControllers', [])
 # TimeViewController
 ###
 timeviewController = ($scope, $routeParams, dataService) ->
+    window.ds = dataService
     $scope.getTotalHours = getTotalHours
 
     $scope.hours = createHourList(START_TIME, END_TIME)
@@ -254,13 +255,25 @@ newPersonDialog = ->
             addPerson: "=addPerson"
             showDialog: "=ngShow"
         }
-        #link: (scope, element, attr) ->
-        #    console.log 'meme', scope, element, attr
+        link: (scope, element, attr) ->
+            scope.elm = $(element).find('input')
+            scope.select = scope.elm.selectize({ create: true, createOnBlur: true })
+            scope.select[0].selectize.on 'change', (value) ->
+                values = value.split(',')
+                scope.newName = values
         controller: ($scope) ->
+            $scope.$watch 'possibleNames', ->
+                for name in $scope.possibleNames
+                    $scope.select[0].selectize.addOption({value: name, text: name})
+                $scope.select[0].selectize.refreshOptions()
             $scope.addPersonClick = (newName) ->
-                console.log("you want to add #{newName}")
-                $scope.addPerson?(newName)
+                if typeof newName.length == 'undefined'
+                    newName = [newName]
+                for name in newName
+                    console.log("you want to add #{name}")
+                    $scope.addPerson?(name)
                 $scope.showDialog = false
+                $scope.select[0].selectize.clear()
             $scope.cancel = ->
                 console.log("canceling...")
                 $scope.showDialog = false

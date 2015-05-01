@@ -1,7 +1,7 @@
 
 <div id="container">
-  <p class="dayNumber">{{ day.date }}</p>
-  <div ng-repeat="person in day.data">
-    <p>{{ person.name }}</p>
+  <p class="day-number">{{ day.date }}</p>
+  <div ng-repeat="person in day.data" class="calendar-day-people-list">
+    <p class="calendar-day-people">{{ person.name }}</p>
   </div>
 </div>

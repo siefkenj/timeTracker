@@ -44,9 +44,12 @@ app = angular.module('calendarControllers', [])
 calendarController = ($scope, $http, dataService, $routeParams) ->
     # the calendar defaults to show the current month
     now = new Date()
-    console.log $routeParams.month, $routeParams.year
-    $scope.monthNum = if $routeParams.month then ($routeParams.month - 1)|0 else now.getMonth()
-    $scope.yearNum = if $routeParams.year then $routeParams.year|0 else now.getFullYear()
+    $scope.monthNum = ($routeParams.month - 1)|0 ||  now.getMonth()
+    $scope.yearNum = $routeParams.year|0 ||  now.getFullYear()
+
+    $scope.incMonth = (inc) ->
+        console.log inc
+        $scope.monthNum += inc
 
     # make the text name visible to the controller
     $scope.monthName = ->

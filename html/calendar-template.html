@@ -1,14 +1,15 @@
 
 <div ng-controller="Calendar" class="container">
-  <input type="number" ng-model="monthNum"/>
-  <h1 id="month">{{ monthName() }} {{ monthNum }} </h1>
+  <div id="month">
+    <h1 ng-click="incMonth(-1)" class="prev-month">&lt;</h1>
+    <h1 ng-click="incMonth(1)" class="next-month">&gt;</h1>
+    <h1 class="month-name">{{ monthName() }}</h1>
+  </div>
   <table year-num="yearNum" month-num="monthNum" class="calendar-view">
     <tr id="week{{$index + 1}}" ng-repeat="week in displayDays">
-      <td ng-repeat="day in week" class="day">
-        <div ng-click="showDay(day.jsDate)">
+      <td ng-repeat="day in week" ng-click="showDay(day.jsDate)" class="day">
+        <div>
           <calendar-day-widget day="day"></calendar-day-widget>
-          <!--p(class='dateNum') {{day.date}}-->
-          <!--p(ng-repeat='person in day.data') {{ person.name }}-->
         </div>
       </td>
     </tr>

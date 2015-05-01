@@ -10,7 +10,13 @@
 //	Install nib with    `npm install nib -g` (for css3 comaptability extensions)
 //
 
+@import 'globals.styl'
 @import 'nib'
+
+.container
+    display:flex
+    flex-direction:column
+    height:100%
 
 .calendar-view
     width:100%
@@ -18,63 +24,41 @@
     flex-grow:1
 
 #month
-    background:orange
-    text-align:center
+    background: orange
     padding:0px
-    margin:0px
+    margin: 0px
 
-.container
-    display:flex
-    flex-direction:column
-    height:100%
+.prev-month, .next-month
+    display: inline
+    cursor: pointer
+    margin: 0px
+
+.prev-month
+    float: left
+
+.next-month
+    float: right
+
+.month-name
+    text-align: center
+    margin: 0px
+
 .day
     border:1px solid black
     text-align:right
     vertical-align:top
+    background: $today-bg
 
-.dayNumber
+.calendar-day-people-list
+    position:relative
+    top: - $day-number-size
+
+.calendar-day-people
+    margin: $calendar-day-people-margin
+
+.day-number
+    text-align:left
     margin:0px
-    border:1px solid black
-/*rowHeight=25px
-
-#container
-	display: flex
-	flex-direction: column
-	flex-wrap: nowrap
-
-.hourScroller, .hourScrollerHeader
-	display: flex
-	flex-direction: row
-.hourScroller
-	flex-grow: 1
-	overflow: auto
-.hourScrollerHeader
-	.name
-		flex-grow: 1
-		text-align: center
-
-.column 
-	&.hours
-		text-align: right
-		margin-right: 4px
-		width: 3em
-		box-sizing: border-box
-	&.hoursGrid
-		flex-grow: 1
-		position: relative
-		background: yellow
-		.time
-			border-top: 2px solid black
-		.hourSpan
-			box-sizing: border-box
-			position: absolute
-			background: rgba(0, 128, 15, 0.75)
-			left: 1em
-			top: rowHeight*1.5
-			height: rowHeight*6
-			padding: 4px
-			border-radius: 8px
-	.time
-		box-sizing: border-box
-		height: rowHeight
-*/
+    font-size:$day-number-size
+    color: $day-number-color
+    overflow: hidden

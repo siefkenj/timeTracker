@@ -1,4 +1,4 @@
 div(id="container")
-    p(class="dayNumber")= "{{ day.date }}"
-    div(ng-repeat="person in day.data")
-        p= "{{ person.name }}"
+    p(class="day-number")= "{{ day.date }}"
+    div(class="calendar-day-people-list" ng-repeat="person in day.data")
+        p(class="calendar-day-people")= "{{ person.name }}"

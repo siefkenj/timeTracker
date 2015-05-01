@@ -11,6 +11,7 @@
 //
 
 @import 'nib'
+@import 'globals.styl'
 
 nonSelectGlow=#006D9F
 
@@ -79,7 +80,7 @@ body
         cursor: pointer
     .close-button:hover
         box-shadow: 0px 0px 3px #FFFA84
-        
+
 
 .hourspan-container.compact-vert
     .duration-text
@@ -94,10 +95,10 @@ body
         font-size: smaller
     .top-time, .bottom-time
         height: 14px
-        
-        
+
+
 .hourspan-container.compact-horiz
-    
+
     .top-time, .bottom-time
         border-radius: 0px
     .stem
@@ -134,15 +135,15 @@ headerHeight = 1.5em
         text-align: center
     .column
         margin-top: headerHeight
-        
-    .column 
+
+    .column
         &.hours-grid
             flex-grow: 1
             position: relative
             background: #FFFFC5
             .hours
                 border-top: 1px solid black
-                
+
 
             for startHour in (minHour..maxHour)
                 for startHalf in 0 5

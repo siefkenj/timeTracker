@@ -206,8 +206,6 @@ personDayInfoWidget = ->
         $scope.$watch('person.times', setTotalHours, true)
         $scope.newTimespan = ->
             $scope.person.times.push({start: 10, end: 11})
-        $scope.removeTimespan = (i) ->
-            $scope.person.times.splice(i, 1)
 
         # compute the largest time interval
         # a timespan can occupy centered at initTime
@@ -228,6 +226,10 @@ personDayInfoWidget = ->
                     removeIndex = i
             if removeIndex?
                 $scope.person.times.splice(removeIndex, 1)
+
+            if $scope.person.times.length == 0
+                delete $scope.$parent.people[$scope.person.name]
+                console.log 'no more times'
             return
         $scope.newTime = (hour, defaultDuration=2) ->
             range = $scope.computeValidTimeRange(hour)

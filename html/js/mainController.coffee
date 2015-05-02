@@ -131,10 +131,22 @@ dataService = ($http, $q) ->
 
             oldRecord = @get(date, null, null, true)
             oldRecord.then (response) ->
-                response.data = data
                 response._id = response._id || date.toDateString()
 
-                collection.updateById(response._id, {data: response.data})
+                # somehow if we're called without data,
+                # gracefully exit
+                if not data?
+                    return
+
+                for k of response.data
+                    # if we found an entry in our data that no longer exists,
+                    # we need to clear the data to make sure it gets completely replaces
+                    # since forerunnerdb by default will merge data
+                    if !(data[k])
+                        collection.update( {_id: response._id}, {$unset: {data: null}})
+                        break
+
+                collection.updateById(response._id, {data: data})
                 d.resolve()
                 collection.save()
 

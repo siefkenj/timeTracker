@@ -56,12 +56,12 @@ setupMonth = function(displayMonth, dataService) {
   thisMonth = (function() {
     var i, ref, results;
     results = [];
-    for (x = i = 1, ref = numDays; 1 <= ref ? i <= ref : i >= ref; x = 1 <= ref ? ++i : --i) {
+    for (x = i = 1, ref = numDays; 1 <= ref ? i < ref : i > ref; x = 1 <= ref ? ++i : --i) {
       results.push(getDate(new Date(year, month, x)));
     }
     return results;
   })();
-  remainingDays = 7 - (new Date(year, month + 1, -1)).getDay();
+  remainingDays = 7 - (new Date(year, month + 1, 0)).getDay();
   nextMonth = (function() {
     var i, ref, results;
     results = [];

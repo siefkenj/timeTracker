@@ -51,12 +51,12 @@ setupMonth = (displayMonth, dataService) ->
     # make an array for the days of the current month
     # find the total number of days in the current month
     numDays = (new Date year, month+1, 0).getDate()
-    thisMonth = (getDate(new Date year, month, x) for x in [1 .. numDays ])
+    thisMonth = (getDate(new Date year, month, x) for x in [1 ... numDays ])
 
     # find the number of days from the end of the current month 
     # to the end of the calendar week
     # i.e. this month ends on a thursday so there are 2 days remaining 
-    remainingDays = 7 - (new Date year, month+1, -1).getDay()
+    remainingDays = 7 - (new Date year, month+1, 0).getDay()
     nextMonth = (getDate(new Date year, month+1, x+1 ) for x in [0 ... remainingDays ])
 
     # make one big array of all the days that are being displayed

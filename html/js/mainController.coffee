@@ -1,10 +1,6 @@
-
 ###
 # Helper Functions
 ###
-
-START_TIME = -2
-END_TIME = 24 + 3
 
 # adds all the attributes of b to a
 extend = (a,b) ->
@@ -21,13 +17,6 @@ app = angular.module('App', ['ngRoute', 'calendarControllers', 'dayviewControlle
 # MainController
 ###
 mainController = ($scope, $routeParams, $location) ->
-    #$scope.getTotalHours = getTotalHours
-    #$scope.timeRangeToClassName = timeRangeToClassName
-    #$scope.formatName = formatName
-
-    #$scope.hours = createHourList(START_TIME, END_TIME)
-    #console.log $scope.people
-
     $scope.showCalendar = ->
         $location.url('/calendar')
         return
@@ -42,8 +31,8 @@ mainController = ($scope, $routeParams, $location) ->
 
     # set up even listeners to see if we've clicked
     # and want to add a new time for someone
-
     return
+
 app.controller('MainController', ['$scope', '$routeParams', '$location', mainController])
 
 # fill a collection with JSON data.

@@ -284,10 +284,6 @@ newPersonDialog = ->
 
 app.directive('newPersonDialog', newPersonDialog)
 
-
-
-
-
 ###
 # Textbased widgets
 ###

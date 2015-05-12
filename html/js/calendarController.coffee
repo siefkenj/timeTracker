@@ -1,12 +1,34 @@
-# returns an array of 7 object arrays representing the current display month
-setupMonth = (displayMonth, dataService) ->
-    year = displayMonth.getFullYear()
-    month = displayMonth.getMonth()
-    # first day is the first day of the week 0 = sunday 6 = saturday
-    firstDay = displayMonth.getDay()
+app = angular.module('calendarControllers', [])
 
-    # generates an object with the tracking information of the date
-    makeDate = (date) ->
+calendarController = ($scope, $http, dataService, $routeParams) ->
+    # the calendar defaults to show the current month
+    now = new Date()
+    # get the month and year from the url or use todays date
+    $scope.monthNum = ($routeParams.month - 1)|0 ||  now.getMonth()
+    $scope.yearNum = $routeParams.year|0 ||  now.getFullYear()
+
+    $scope.incMonth = (inc) ->
+        $scope.monthNum += inc
+
+    $scope.monthName = ->
+        # returns the text of the current month
+        nav = window.navigator
+        locale = nav.language || nav.userLanguage
+        date = new Date $scope.yearNum, $scope.monthNum, 1
+        return date.toLocaleDateString locale, {month: 'long'}
+
+    $scope.$watch 'monthNum', ->
+        # this is run every time monthNum changes so it it necessary to
+        # use the scopes year and month as the month will vary
+        newDate = new Date $scope.yearNum, $scope.monthNum, 1
+        # display days is an array of objects representing the calendar data
+        $scope.displayDays = setupMonth newDate, dataService
+    return
+
+setupMonth = (displayMonth, dataService) ->
+    # returns an array of arrays representing the current month
+    getDate = (date) ->
+        # generates an object with the time information of the specified date
         ret =
             jsDate: date
             date: date.getDate()
@@ -16,22 +38,33 @@ setupMonth = (displayMonth, dataService) ->
                 ret.data = dayData
         return ret
 
-    lastMonth = (makeDate(new Date(year, month, -x)) for x in [0 ... firstDay]).reverse()
+    year = displayMonth.getFullYear()
+    month = displayMonth.getMonth()
+    #first day of the week 0 = sunday 6 = saturday
+    firstDay = displayMonth.getDay()
 
+    # make and array for the days of last month that are to be displayed
+    # i.e if this month starts on tuesday, find the dates of sunday and 
+    # monday of last month
+    lastMonth = (getDate(new Date year, month, -x) for x in [0 ... firstDay]).reverse()
+
+    # make an array for the days of the current month
     # find the total number of days in the current month
-    numDays = (new Date( year, month+1, 0)).getDate()
-    thisMonth = (makeDate(new Date(year, month, x)) for x in [1 .. numDays ])
+    numDays = (new Date year, month+1, 0).getDate()
+    thisMonth = (getDate(new Date year, month, x) for x in [1 ... numDays ])
 
-    # find the number of days from the end of the current month to the end of the calendar week
-    remainingDays = (7 - (numDays + firstDay) %% 7) %% 7
-    nextMonth = (makeDate(new Date(year, month + 1, x + 1 )) for x in [0 ... remainingDays ])
+    # find the number of days from the end of the current month 
+    # to the end of the calendar week
+    # i.e. this month ends on a thursday so there are 2 days remaining 
+    remainingDays = 7 - (new Date year, month+1, 0).getDay()
+    nextMonth = (getDate(new Date year, month+1, x+1 ) for x in [0 ... remainingDays ])
 
     # make one big array of all the days that are being displayed
     displayDays = lastMonth.concat thisMonth.concat nextMonth
+
     result = []
-    # build and array of 7 element arrays representing the days that are to be displayed in the
-    # calendar
     week = []
+    # build and array of 7 element arrays representing 
     for day, index in displayDays
         week.push(day)
         if !((index+1) % 7)
@@ -39,35 +72,12 @@ setupMonth = (displayMonth, dataService) ->
             week = []
     return result
 
-app = angular.module('calendarControllers', [])
-
-calendarController = ($scope, $http, dataService, $routeParams) ->
-    # the calendar defaults to show the current month
-    now = new Date()
-    $scope.monthNum = ($routeParams.month - 1)|0 ||  now.getMonth()
-    $scope.yearNum = $routeParams.year|0 ||  now.getFullYear()
-
-    $scope.incMonth = (inc) ->
-        console.log inc
-        $scope.monthNum += inc
-
-    # make the text name visible to the controller
-    $scope.monthName = ->
-        locale = 'en-us'
-        date = new Date($scope.yearNum, $scope.monthNum, 1)
-        return date.toLocaleDateString(locale, {month: 'long'})
-
-    $scope.$watch 'monthNum', ->
-        # display days is an array of object representing the calendar data
-        $scope.displayDays = setupMonth(
-            # this is run every time monthNum changes so it it necessary to
-            # use the scopes year and month as the month will vary
-            new Date($scope.yearNum, $scope.monthNum, 1),
-            dataService
-        )
-    return
-
-app.controller('Calendar', ['$scope', '$http', 'dataService', '$routeParams', calendarController])
+app.controller 'Calendar', [
+    '$scope',
+    '$http',
+    'dataService',
+    '$routeParams',
+    calendarController]
 
 calendarDayWidget = ->
     templateUrl: 'templates/calendar_day_widget.html'
@@ -75,4 +85,4 @@ calendarDayWidget = ->
     scope:
         day: "=day"
 
-app.directive('calendarDayWidget', calendarDayWidget)
+app.directive 'calendarDayWidget', calendarDayWidget

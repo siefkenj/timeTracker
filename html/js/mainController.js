@@ -107,6 +107,7 @@ dataService = function($http, $q) {
     return people;
   };
   ret = {
+    collection: collection,
     get: (function(_this) {
       return function(year, month, day, giveRecord) {
         var d, date;
@@ -122,7 +123,10 @@ dataService = function($http, $q) {
         d = $q.defer();
         dbDeferred.promise.then(function() {
           var info;
-          info = collection.findById(date.toDateString()) || {};
+          info = collection.findById(date.toDateString()) || {
+            data: {},
+            emptyData: true
+          };
           if (giveRecord) {
             return d.resolve(info);
           } else {
@@ -138,6 +142,9 @@ dataService = function($http, $q) {
         args = {};
       }
       year = args.year, month = args.month, day = args.day, date = args.date, data = args.data;
+      if (data == null) {
+        return;
+      }
       if (year instanceof Date) {
         day = year.getDate();
         month = year.getMonth() + 1;
@@ -149,8 +156,9 @@ dataService = function($http, $q) {
       oldRecord.then(function(response) {
         var k;
         response._id = response._id || date.toDateString();
-        if (data == null) {
-          return;
+        if (response.emptyData) {
+          delete response.emptyData;
+          collection.insert(response);
         }
         for (k in response.data) {
           if (!data[k]) {
@@ -203,6 +211,7 @@ dataService = function($http, $q) {
       d = $q.defer();
       oldRecord = this.get(date, null, null, true);
       oldRecord.then(function(response) {
+        console.log('xx', response);
         response.data[person.name] = {
           name: person.name,
           times: [

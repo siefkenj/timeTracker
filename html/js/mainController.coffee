@@ -99,6 +99,7 @@ dataService = ($http, $q) ->
         return people
 
     ret =
+        collection: collection
         get: (year, month, day, giveRecord=false) =>
             if year instanceof Date
                 day = year.getDate()
@@ -109,16 +110,19 @@ dataService = ($http, $q) ->
             # return a promise that gives the data for that day
             d = $q.defer()
             dbDeferred.promise.then ()->
-                info = collection.findById(date.toDateString()) || {}
+                info = collection.findById(date.toDateString()) || {data: {}, emptyData: true}
                 if giveRecord
                     d.resolve(info)
                 else
                     d.resolve(info.data)
-            #data.then (response) ->
-            #    d.resolve(response[date.toDateString()] || {})
             return d.promise
         setDayData: (args={}) ->
             {year, month, day, date, data} = args
+            # somehow if we're called without data,
+            # gracefully exit
+            if not data?
+                return
+
             if year instanceof Date
                 day = year.getDate()
                 month = year.getMonth() + 1
@@ -133,10 +137,12 @@ dataService = ($http, $q) ->
             oldRecord.then (response) ->
                 response._id = response._id || date.toDateString()
 
-                # somehow if we're called without data,
-                # gracefully exit
-                if not data?
-                    return
+                # response.emptyData will be true if there was no record
+                # for this particular date.  In this case, we will create a record
+                # that can then be updated by ID
+                if response.emptyData
+                    delete response.emptyData
+                    collection.insert(response)
 
                 for k of response.data
                     # if we found an entry in our data that no longer exists,
@@ -177,6 +183,7 @@ dataService = ($http, $q) ->
 
             oldRecord = @get(date,null,null,true)
             oldRecord.then (response) ->
+                console.log 'xx', response
                 response.data[person.name] =
                     name: person.name
                     times: [{start:10,end:11}]

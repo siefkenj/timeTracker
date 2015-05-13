@@ -3,11 +3,7 @@
 /*
  * Helper Functions
  */
-var END_TIME, START_TIME, app, dataService, extend, mainController, populateDatabase;
-
-START_TIME = -2;
-
-END_TIME = 24 + 3;
+var app, dataService, extend, mainController, populateDatabase;
 
 extend = function(a, b) {
   var k, v;

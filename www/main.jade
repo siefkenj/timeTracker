@@ -1,0 +1,81 @@
+doctype html
+//html(lang="en", ng-app='App')
+html(lang="en", ng-app='App')
+    head
+        meta(charset="UTF-8")
+        meta(name="viewport", content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no")
+        meta(http-equiv="X-UA-Compatible", content="IE=edge")
+
+        title='Time Tracker'
+
+        // local content
+        link(href="css/bootstrap.css" rel="stylesheet")
+        link(href="css/main.css" rel="stylesheet")
+
+        // our lovely javascript dependencies
+        script(src='js/jquery-2.1.3.min.js', type="text/javascript")
+        script(src='js/bootstrap.js', type="text/javascript")
+        //script(src='js/angular.js', type="text/javascript")
+        //script(src='js/angular-route.js', type="text/javascript")
+        script(src='js/interact-1.2.3.js', type="text/javascript")
+        script(src="js/forerunnerdb-all.js", type="text/javascript")
+
+    //body(ng-controller="MainController")
+    body
+        nav(class="navbar navbar-default navbar-fixed-top")
+            div(class="container")
+                div(class="navbar-header")
+                    button(type="button" class="navbar-toggle collapsed", data-toggle="collapse", data-target="#navbar", aria-expanded="false", aria-controls="navbar")
+                        span(class="sr-only")="Toggle navigation"
+                        span(class="icon-bar")
+                        span(class="icon-bar")
+                        span(class="icon-bar")
+                    div(class="navbar-brand")="Time Tracker"
+                div(id="navbar" class="collapse navbar-collapse")
+                    ul(class="nav navbar-nav")
+                        li(class="active")
+                            a(href="#")="Calendar"
+                        li(class="nav-year")
+                            a(href="#")="2015"
+                        li(class="nav-month")
+                            a(href="#")="May"
+                        li(class="nav-day")                    
+                            a(href="#")="6"
+                        li
+                            a(href="#")="Statistics"
+        div(class="main-container container")
+            nav(class="flex-row-non-expand")
+                ul(class="pager")
+                    li(class="previous")
+                        a(href="#")
+                            span(aria-hidden="true")="←"
+                            | Previous
+
+                    li(class="next")
+                        a(href="#")="Next"
+                            span(aria-hidden="true")="→"
+                    div(class="btn-group" role="group")
+                        div(class="btn-group" role="group")
+                            button(type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown")
+                                span(class="caret")
+                                |  2015
+                            ul(class="dropdown-menu" role="menu")
+                                li
+                                    a(href="#")="2014"
+                                li
+                                    a(href="#")="2015"
+                                li
+                                    a(href="#")="2016"
+                        div(class="btn-group" role="group")
+                            button(type="button" class="btn btn-default dropdown-toggle" data-toggle="dropdown")
+                                | May 
+                                span(class="caret")
+                            ul(class="dropdown-menu" role="menu")
+                                li
+                                    a(href="#")="May"
+                                li
+                                    a(href="#")="June"
+                                li
+                                    a(href="#")="July"
+            div(class="flex-row-expand")
+                div(class="calendar-container")="the cal"

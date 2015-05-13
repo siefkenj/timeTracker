@@ -15,11 +15,11 @@ compile() {
 	fi
 	if [[ "$EXTENSION" == "styl" ]]
 	then
-		stylus -w "html/css" -u nib &
+		stylus -w "$FILENAME" -u nib &
 	fi
 	if [[ "$EXTENSION" == "jade" ]]
 	then
-		jade --pretty "html" &
+		jade --pretty "$FILENAME" &
 	fi
 }
 

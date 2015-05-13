@@ -1,0 +1,73 @@
+html {
+  height: 100%;
+}
+body {
+  padding-top: 50px;
+  height: 100%;
+}
+.nav-year,
+.nav-month,
+.nav-day {
+  font-size: smaller;
+}
+.nav-month a {
+  padding-right: 5px !important;
+  padding-left: 5px !important;
+}
+.nav-year a {
+  padding-right: 5px !important;
+}
+.nav-day a {
+  padding-left: 5px !important;
+}
+.nav-month:before,
+.nav-day:before {
+  content: '/';
+  float: left;
+  position: relative;
+  padding-top: 18px;
+}
+.pager .dropdown-menu li a {
+  display: block;
+  -webkit-border-radius: 0px;
+  border-radius: 0px;
+  border: none;
+}
+.main-container {
+  height: 100%;
+  display: -webkit-box;
+  display: -moz-box;
+  display: -webkit-flex;
+  display: -ms-flexbox;
+  display: box;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -moz-box-orient: vertical;
+  -o-box-orient: vertical;
+  -webkit-flex-direction: column;
+  -ms-flex-direction: column;
+  flex-direction: column;
+}
+.flex-row-non-expand {
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -o-box-flex: 1;
+  box-flex: 1;
+  -webkit-flex: 0 1 auto;
+  -ms-flex: 0 1 auto;
+  flex: 0 1 auto;
+}
+.flex-row-expand {
+  -webkit-box-flex: 1;
+  -moz-box-flex: 1;
+  -o-box-flex: 1;
+  box-flex: 1;
+  -webkit-flex: 1 1 auto;
+  -ms-flex: 1 1 auto;
+  flex: 1 1 auto;
+}
+.calendar-container {
+  width: 100%;
+  height: 100%;
+  background: #800080;
+}

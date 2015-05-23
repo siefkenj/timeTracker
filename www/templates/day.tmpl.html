@@ -1,0 +1,51 @@
+
+<nav class="flex-row-non-expand">
+  <ul class="pager">
+    <li class="previous"><a href="#"><span aria-hidden="true">←</span>Previous</a></li>
+    <li class="next"><a href="#">Next<span aria-hidden="true">→</span></a></li>
+    <div role="group" class="btn-group">
+      <button type="button" class="btn btn-default">{{year}} / {{month}} / {{day}}</button>
+    </div>
+  </ul>
+</nav>
+<div class="flex-row-expand">
+  <div class="day-container">
+    <day-table people="people" hours="hours"></day-table>
+  </div>
+</div>
+<!---->
+<!-- we include all the neccessary templates right here!-->
+<!---->
+<script type="text/ng-template" id="day-table.tmpl.html">
+  <table class="table table-fixed">
+    <thead>
+      <tr>
+        <th class="col-hour"></th>
+        <th ng-repeat="person in people" x-name="{{person.name}}">{{person.name}}
+          <hourspan span="span" ng-repeat="span in person.times" person="person"></hourspan></th>
+        <th class="col-new">
+          <button class="btn btn-primary">New <span aria-hidden="true" class="glyphicon glyphicon-plus"></span></button>
+        </th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr ng-repeat="hour in hours" on-last-repeat="on-last-repeat" class="{{hour.thisday}}">
+        <td class="col-hour hour">{{hour.hour}}</td>
+        <td ng-repeat="person in people" x-hour="{{hour.time}}" class="hour"></td>
+        <td class="col-new hour"></td>
+      </tr>
+    </tbody>
+  </table>
+</script>
+<script type="text/ng-template" id="hourspan.tmpl.html">
+  <div class="hourspan-container">
+    <div class="hourspan alert alert-success">
+      <div class="drag-handle top">
+        <div class="drag-handle-container"><span class="icon-bar"></span><span class="icon-bar"></span></div>
+      </div>"Hours"
+      <div class="drag-handle bottom">
+        <div class="drag-handle-container"><span class="icon-bar"></span><span class="icon-bar"></span></div>
+      </div>
+    </div>
+  </div>
+</script>

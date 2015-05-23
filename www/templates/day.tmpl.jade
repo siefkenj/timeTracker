@@ -1,0 +1,46 @@
+nav(class="flex-row-non-expand")
+    ul(class="pager")
+        li(class="previous")
+            a(href="#")
+                span(aria-hidden="true")="←"
+                | Previous
+
+        li(class="next")
+            a(href="#")="Next"
+                span(aria-hidden="true")="→"
+        div(class="btn-group" role="group")
+            button(type="button" class="btn btn-default")="{{year}} / {{month}} / {{day}}"
+div(class="flex-row-expand")
+    div(class="day-container")
+        day-table(people="people", hours="hours")
+//
+// we include all the neccessary templates right here!
+//
+script(type="text/ng-template" id="day-table.tmpl.html")
+    table(class="table table-fixed")
+        thead
+            tr
+                th(class="col-hour")
+                th(ng-repeat="person in people", x-name="{{person.name}}")="{{person.name}}"
+                    hourspan(span="span", ng-repeat="span in person.times", person="person")
+                th(class="col-new")
+                    button(class="btn btn-primary")="New "
+                        span(class="glyphicon glyphicon-plus", aria-hidden="true")
+        tbody
+            tr(ng-repeat="hour in hours", class="{{hour.thisday}}", on-last-repeat)
+                td(class="col-hour hour")="{{hour.hour}}"
+                td(ng-repeat="person in people", class="hour", x-hour="{{hour.time}}")
+                td(class="col-new hour")
+
+script(type="text/ng-template" id="hourspan.tmpl.html")
+    div(class="hourspan-container")
+        div(class="hourspan alert alert-success")
+            div(class="drag-handle top")
+                div(class="drag-handle-container")
+                    span(class="icon-bar")
+                    span(class="icon-bar")
+            |"Hours"
+            div(class="drag-handle bottom")
+                div(class="drag-handle-container")
+                    span(class="icon-bar")
+                    span(class="icon-bar")

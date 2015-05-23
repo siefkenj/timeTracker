@@ -71,3 +71,64 @@ body {
   height: 100%;
   background: #800080;
 }
+.day-container {
+  width: 100%;
+  height: 100%;
+  overflow: auto;
+}
+.day-container .not-today {
+  background: #cbcbcb;
+  color: #878787;
+}
+.day-container .col-hour {
+  width: 2em;
+  text-align: right;
+}
+.day-container .col-new {
+  width: 3em;
+  text-align: right;
+}
+.day-container .table {
+  position: relative;
+}
+.day-container .hourspan-container {
+  position: absolute;
+  width: 7em;
+  height: 9em;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+.day-container .hourspan {
+  height: 100%;
+  position: relative;
+}
+.alert .icon-bar {
+  -webkit-border-radius: 0.5px;
+  border-radius: 0.5px;
+  display: block;
+  width: 22px;
+  height: 1px;
+  background-color: #3c763d;
+  margin-bottom: 1px;
+}
+.alert .drag-handle {
+  width: 100%;
+  text-align: center;
+  height: 4px;
+}
+.alert .drag-handle {
+  cursor: pointer;
+}
+.alert .drag-handle.top {
+  background-color: #3c763d;
+  margin-top: -12px;
+}
+.alert .drag-handle.bottom {
+  position: absolute;
+  background-color: #3c763d;
+  bottom: 5px;
+}
+.alert .drag-handle-container {
+  display: inline-block;
+  height: 4px;
+}

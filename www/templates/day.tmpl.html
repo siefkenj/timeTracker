@@ -17,11 +17,12 @@
 <!-- we include all the neccessary templates right here!-->
 <!---->
 <script type="text/ng-template" id="day-table.tmpl.html">
+  <div ng-show="showHover" class="new-hourspan-hover"><span class="glyphicon glyphicon-plus"></span> Time Span </div>
   <table class="table table-fixed">
     <thead>
       <tr>
         <th class="col-hour"></th>
-        <th ng-repeat="person in people" x-name="{{person.name}}">{{person.name}}
+        <th ng-repeat="(name, person) in people" x-name="{{person.name}}">{{person.name}}
           <hourspan span="span" ng-repeat="span in person.times" person="person"></hourspan></th>
         <th class="col-new">
           <button class="btn btn-primary">New <span aria-hidden="true" class="glyphicon glyphicon-plus"></span></button>
@@ -31,7 +32,7 @@
     <tbody>
       <tr ng-repeat="hour in hours" on-last-repeat="on-last-repeat" class="{{hour.thisday}}">
         <td class="col-hour hour">{{hour.hour}}</td>
-        <td ng-repeat="person in people" x-hour="{{hour.time}}" class="hour"></td>
+        <td ng-repeat="person in people" x-hour="{{hour.time}}" x-name="{{person.name}}" class="hour hoverable"></td>
         <td class="col-new hour"></td>
       </tr>
     </tbody>
@@ -40,9 +41,11 @@
 <script type="text/ng-template" id="hourspan.tmpl.html">
   <div class="hourspan-container">
     <div class="hourspan alert alert-success">
+      <button ng-click="remove()" class="btn btn-default remove-button"><span class="glyphicon glyphicon-trash"></span></button>
       <div class="drag-handle top">
         <div class="drag-handle-container"><span class="icon-bar"></span><span class="icon-bar"></span></div>
-      </div>"Hours"
+      </div>
+      <div class="middle">Hours</div>
       <div class="drag-handle bottom">
         <div class="drag-handle-container"><span class="icon-bar"></span><span class="icon-bar"></span></div>
       </div>

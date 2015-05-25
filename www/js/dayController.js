@@ -29,8 +29,8 @@ dayController = function($scope, $routeParams, dataService) {
       return $scope.people = dayData;
     });
   };
-  $scope.people = [
-    {
+  $scope.people = {
+    'Andrew': {
       name: 'Andrew',
       times: [
         {
@@ -41,7 +41,8 @@ dayController = function($scope, $routeParams, dataService) {
           end: 8
         }
       ]
-    }, {
+    },
+    'Seth': {
       name: 'Seth',
       times: [
         {
@@ -49,7 +50,8 @@ dayController = function($scope, $routeParams, dataService) {
           end: 8
         }
       ]
-    }, {
+    },
+    'Paul': {
       name: 'Paul',
       times: [
         {
@@ -58,7 +60,7 @@ dayController = function($scope, $routeParams, dataService) {
         }
       ]
     }
-  ];
+  };
   $scope.possibleNames = [];
   dataService.getPossibleNames().then(function(names) {
     return $scope.possibleNames = names;
@@ -107,14 +109,57 @@ dayTableWidget = function() {
       people: '=',
       hours: '='
     },
-    link: function(scope, element, attr) {
-      return scope.container = element;
+    link: function(scope, elm, attr) {
+      scope.container = elm;
+      scope.hoverElm = $(elm).find('.new-hourspan-hover');
+      $(elm).on('click', function(evt) {
+        var hour, name, parent, person, target;
+        target = evt.target;
+        parent = $(target).closest('.hour[x-name]')[0];
+        if (parent != null) {
+          name = parent.getAttribute('x-name');
+          hour = parseInt(parent.getAttribute('x-hour'), 10);
+          person = scope.people[name];
+          scope.newTime(person, hour);
+          scope.showHover = false;
+          return scope.$apply();
+        }
+      });
+      $(elm).on('mousemove', function(evt) {
+        var oldHover, parent, target;
+        target = evt.target;
+        oldHover = scope.showHover;
+        parent = $(target).closest('.hour[x-name]')[0];
+        if (parent != null) {
+          if (!$(target).closest('.new-hourspan-hover')[0]) {
+            $(target).append(scope.hoverElm);
+          }
+          scope.showHover = true;
+        } else {
+          scope.showHover = false;
+        }
+        if (!$(parent).hasClass('hoverable')) {
+          scope.showHover = false;
+        }
+        if (oldHover !== scope.showHover) {
+          return scope.$apply();
+        }
+      });
+      return $(elm).on('mouseleave', function(evt) {
+        var oldHover;
+        oldHover = scope.showHover;
+        scope.showHover = false;
+        if (oldHover !== scope.showHover) {
+          return scope.$apply();
+        }
+      });
     },
     controller: function($scope) {
+      $scope.showHover = false;
       $scope.offsets = {};
       $scope.hourHeight = 20;
       $scope.computeOffsets = function() {
-        var col, hour, j, k, len, person, ref, ref1, ref2, row, tops;
+        var _, col, hour, j, person, ref, ref1, ref2, row, tops;
         tops = {};
         for (hour = j = ref = START_TIME, ref1 = END_TIME; ref <= ref1 ? j <= ref1 : j >= ref1; hour = ref <= ref1 ? ++j : --j) {
           row = $scope.container.find("[x-hour=\"" + hour + "\"]")[0];
@@ -123,8 +168,8 @@ dayTableWidget = function() {
           }
         }
         ref2 = $scope.people;
-        for (k = 0, len = ref2.length; k < len; k++) {
-          person = ref2[k];
+        for (_ in ref2) {
+          person = ref2[_];
           col = $scope.container.find("[x-name=\"" + person.name + "\"]")[0];
           if (col == null) {
             return;
@@ -223,10 +268,36 @@ dayTableWidget = function() {
           end: end
         };
       };
+      $scope.newTime = function(person, hour, defaultDuration) {
+        var newRange, range;
+        if (defaultDuration == null) {
+          defaultDuration = 2;
+        }
+        range = $scope.computeValidTimeRange(person, hour);
+        newRange = {
+          start: hour,
+          end: hour + defaultDuration
+        };
+        newRange.end = Math.min(newRange.end, range.end);
+        newRange.start = newRange.end - defaultDuration;
+        newRange.start = Math.max(newRange.start, range.start);
+        person.times.push(newRange);
+      };
       $scope.$on('onLastRepeat', function() {
+        console.log('last');
         $scope.computeOffsets();
         return $scope.$broadcast('offsetsComputed', $scope.offsets);
       });
+      $scope.makeHoverable = function(choice) {
+        if (choice == null) {
+          choice = true;
+        }
+        if (choice) {
+          $($scope.container).find('.hour[x-name]').addClass('hoverable');
+        } else {
+          $($scope.container).find('.hour[x-name]').removeClass('hoverable');
+        }
+      };
       window.sss = $scope;
     }
   };
@@ -243,7 +314,7 @@ hourspanWidget = function() {
       person: '='
     },
     link: function(scope, elm, attr) {
-      var bottom, bounds, oldHourChange, origTimeEnd, origTimeStart, startY, top;
+      var bottom, bounds, oldHourChange, origTimeEnd, origTimeStart, startY, top, topDragEnd, topDragMove, topDragStart;
       scope.container = elm.find('.hourspan-container');
       oldHourChange = null;
       startY = null;
@@ -257,17 +328,19 @@ hourspanWidget = function() {
       top.draggable({
         max: Infinity
       });
-      top.on('dragstart', function(evt) {
+      topDragStart = function(evt) {
         startY = evt.pageY;
         origTimeStart = scope.span.start;
         origTimeEnd = scope.span.end;
-        return bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart + origTimeEnd) / 2, {
+        bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart + origTimeEnd) / 2, {
           start: origTimeStart,
           end: origTimeEnd
         });
-      });
-      top.on('dragmove', function(evt) {
+        return scope.$parent.makeHoverable(false);
+      };
+      topDragMove = function(evt) {
         var delta, hourChange, hourHeight, startHour;
+        evt.preventDefault();
         hourHeight = scope.$parent.hourHeight;
         delta = startY - evt.pageY;
         hourChange = roundToHalf(delta / hourHeight);
@@ -279,7 +352,20 @@ hourspanWidget = function() {
           scope.span.start = startHour;
           return scope.$apply();
         }
+      };
+      topDragEnd = function(evt) {
+        return scope.$parent.makeHoverable(true);
+      };
+      top.on('dragstart', topDragStart);
+      top.on('dragend', topDragEnd);
+      top.on('dragmove', topDragMove);
+      top = interact($(elm).find('.remove-button')[0]);
+      top.draggable({
+        max: Infinity
       });
+      top.on('dragstart', topDragStart);
+      top.on('dragend', topDragEnd);
+      top.on('dragmove', topDragMove);
       bottom = interact($(elm).find('.drag-handle.bottom')[0]);
       bottom.draggable({
         max: Infinity
@@ -288,13 +374,18 @@ hourspanWidget = function() {
         startY = evt.pageY;
         origTimeEnd = scope.span.end;
         origTimeStart = scope.span.start;
-        return bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart + origTimeEnd) / 2, {
+        bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart + origTimeEnd) / 2, {
           start: origTimeStart,
           end: origTimeEnd
         });
+        return scope.$parent.makeHoverable(false);
+      });
+      bottom.on('dragend', function(evt) {
+        return scope.$parent.makeHoverable(true);
       });
       bottom.on('dragmove', function(evt) {
         var delta, endHour, hourChange, hourHeight;
+        evt.preventDefault();
         hourHeight = scope.$parent.hourHeight;
         delta = startY - evt.pageY;
         hourChange = roundToHalf(delta / hourHeight);
@@ -311,20 +402,38 @@ hourspanWidget = function() {
     controller: function($scope) {
       var resize;
       resize = function() {
-        var css, offests;
+        var css, height, offests;
         offests = $scope.$parent.getOffsets($scope.person.name, $scope.span);
+        height = offests.bottom - offests.top;
         css = {
-          left: offests.left,
-          width: offests.width,
-          height: offests.bottom - offests.top,
+          height: height,
           top: offests.top
         };
-        return $scope.container.css(css);
+        $scope.container.css(css);
+        if (height < 50) {
+          return $scope.container.addClass('compact');
+        } else {
+          return $scope.container.removeClass('compact');
+        }
+      };
+      $scope.remove = function() {
+        var i, j, len, r, ref, removeIndex;
+        ref = $scope.person.times;
+        for (i = j = 0, len = ref.length; j < len; i = ++j) {
+          r = ref[i];
+          if (r.start === $scope.span.start && r.end === $scope.span.end) {
+            removeIndex = i;
+          }
+        }
+        if (removeIndex != null) {
+          $scope.person.times.splice(removeIndex, 1);
+        }
+        if ($scope.person.times.length === 0) {
+          delete $scope.$parent.people[$scope.person.name];
+        }
       };
       $scope.$watch('span', resize, true);
-      return $scope.$on('offsetsComputed', function() {
-        return resize();
-      });
+      return $scope.$on('offsetsComputed', resize);
     }
   };
 };

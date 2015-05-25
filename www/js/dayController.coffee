@@ -24,11 +24,11 @@ dayController = ($scope, $routeParams, dataService) ->
         .then (dayData) ->
             $scope.people = dayData
     #updatePeople()
-    $scope.people = [
-        { name: 'Andrew', times: [{start:10, end:12}, {start:4, end:8}] },
-        { name: 'Seth', times: [{start:4, end:8}] },
-        { name: 'Paul', times: [{start:14, end:15.5}] },
-    ]
+    $scope.people =
+        'Andrew': { name: 'Andrew', times: [{start:10, end:12}, {start:4, end:8}] },
+        'Seth': { name: 'Seth', times: [{start:4, end:8}] },
+        'Paul': { name: 'Paul', times: [{start:14, end:15.5}] },
+    
 
     $scope.possibleNames = []
     dataService.getPossibleNames().then (names) ->
@@ -69,9 +69,56 @@ dayTableWidget = ->
     scope:
         people: '='
         hours: '='
-    link: (scope, element, attr) ->
-        scope.container = element
+    link: (scope, elm, attr) ->
+        scope.container = elm
+        scope.hoverElm = $(elm).find('.new-hourspan-hover')
+
+        $(elm).on 'click', (evt) ->
+            target = evt.target
+            # find if we clicked on any child of a valid
+            # hour column
+            parent = $(target).closest('.hour[x-name]')[0]
+            if parent?
+                name = parent.getAttribute('x-name')
+                hour = parseInt(parent.getAttribute('x-hour'), 10)
+                person = scope.people[name]
+                
+                scope.newTime(person, hour)
+                scope.showHover = false
+                scope.$apply()
+
+        $(elm).on 'mousemove', (evt) ->
+            target = evt.target
+            oldHover = scope.showHover
+            # find if we clicked on an empty hour row
+            parent = $(target).closest('.hour[x-name]')[0]
+            if parent?
+                # don't reparent if we are a child
+                if not $(target).closest('.new-hourspan-hover')[0]
+                    $(target).append(scope.hoverElm)
+
+                scope.showHover = true
+            else
+                scope.showHover = false
+
+            # if we're not hoverable, we don't want to show nomatter what
+            if not $(parent).hasClass('hoverable')
+                scope.showHover = false
+
+            # angular is watching a lot of things, only tell it to digest if we need to
+            if oldHover != scope.showHover
+                scope.$apply()
+
+        $(elm).on 'mouseleave', (evt) ->
+            oldHover = scope.showHover
+            scope.showHover = false
+            # angular is watching a lot of things, only tell it to digest if we need to
+            if oldHover != scope.showHover
+                scope.$apply()
+
     controller: ($scope) ->
+        $scope.showHover = false
+
         # these are the position offsets
         # for each column
         $scope.offsets = {}
@@ -84,7 +131,7 @@ dayTableWidget = ->
                 if row
                     tops[hour] = row.offsetTop
 
-            for person in $scope.people
+            for _,person of $scope.people
                 col = $scope.container.find("[x-name=\"#{person.name}\"]")[0]
                 if not col?
                     return
@@ -105,7 +152,6 @@ dayTableWidget = ->
                     top: hourSpan.start*20
                 return ret
 
-            
             # linearly interpolate values using the keys
             # of values as the xs and the value of values as
             # the ys
@@ -122,7 +168,6 @@ dayTableWidget = ->
                 decimal = hour - x1
                 return values[x1] + decimal*delta
 
-
             offsets = $scope.offsets[name]
             hours = Object.keys(offsets.tops)
             minHour = Math.min(hours...)
@@ -135,7 +180,6 @@ dayTableWidget = ->
                 width: offsets.width
                 bottom: offsets.tops[maxHour]
                 top: offsets.tops[minHour]
-
 
             # compute the top and bottom offset as the linear interpolation
             # betwen the nearest hours
@@ -157,10 +201,36 @@ dayTableWidget = ->
             start = Math.max(-3, start)
 
             return {start: start, end: end}
+        # adds a new timespan to `person` of a fixed duration
+        # attempting to have the result start at hour `hour`.
+        # If it cannot start at `hour` (because another timespan
+        # is in the way), the start and end time will be adjusted
+        # to keep the duration `defaultDuration`
+        $scope.newTime = (person, hour, defaultDuration=2) ->
+            range = $scope.computeValidTimeRange(person, hour)
+            # create a new range that defaults to defaultDuration hours 
+            # but is garunteed to remain in the bounds of range
+            newRange =
+                start: hour
+                end: hour + defaultDuration
+            newRange.end = Math.min(newRange.end, range.end)
+            newRange.start = newRange.end - defaultDuration
+            newRange.start = Math.max(newRange.start, range.start)
+            
+            person.times.push(newRange)
+            return
 
         $scope.$on 'onLastRepeat', ->
+            console.log 'last'
             $scope.computeOffsets()
             $scope.$broadcast('offsetsComputed', $scope.offsets)
+
+        $scope.makeHoverable = (choice=true) ->
+            if choice
+                $($scope.container).find('.hour[x-name]').addClass('hoverable')
+            else
+                $($scope.container).find('.hour[x-name]').removeClass('hoverable')
+            return
         
         window.sss = $scope
         return
@@ -187,12 +257,17 @@ hourspanWidget = ->
         
         top = interact($(elm).find('.drag-handle.top')[0])
         top.draggable({max: Infinity})
-        top.on 'dragstart', (evt) ->
+        topDragStart = (evt) ->
             startY = evt.pageY
             origTimeStart = scope.span.start
             origTimeEnd = scope.span.end
             bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart+origTimeEnd)/2, {start: origTimeStart, end: origTimeEnd})
-        top.on 'dragmove', (evt) ->
+            
+            # make sure we don't accidentally trigger
+            # unwanted hover events on the parent
+            scope.$parent.makeHoverable(false)
+        topDragMove = (evt) ->
+            evt.preventDefault()
             hourHeight = scope.$parent.hourHeight
             delta = startY - evt.pageY
 
@@ -207,6 +282,20 @@ hourspanWidget = ->
                 startHour = Math.min(startHour, origTimeEnd - .5)
                 scope.span.start = startHour
                 scope.$apply()
+        topDragEnd = (evt) ->
+            # restore hover functionality
+            scope.$parent.makeHoverable(true)
+        top.on('dragstart', topDragStart)
+        top.on('dragend', topDragEnd)
+        top.on('dragmove', topDragMove)
+
+        # make the remove button act like a drag handle when it is dragged
+        top = interact($(elm).find('.remove-button')[0])
+        top.draggable({max: Infinity})
+        top.on('dragstart', topDragStart)
+        top.on('dragend', topDragEnd)
+        top.on('dragmove', topDragMove)
+
         
         bottom = interact($(elm).find('.drag-handle.bottom')[0])
         bottom.draggable({max: Infinity})
@@ -215,7 +304,15 @@ hourspanWidget = ->
             origTimeEnd = scope.span.end
             origTimeStart = scope.span.start
             bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart+origTimeEnd)/2, {start: origTimeStart, end: origTimeEnd})
+            
+            # make sure we don't accidentally trigger
+            # unwanted hover events on the parent
+            scope.$parent.makeHoverable(false)
+        bottom.on 'dragend', (evt) ->
+            # restore hover functionality
+            scope.$parent.makeHoverable(true)
         bottom.on 'dragmove', (evt) ->
+            evt.preventDefault()
             hourHeight = scope.$parent.hourHeight
             delta = startY - evt.pageY
 
@@ -235,17 +332,34 @@ hourspanWidget = ->
     controller: ($scope) ->
         resize = ->
             offests = $scope.$parent.getOffsets($scope.person.name, $scope.span)
+            height = offests.bottom - offests.top
             css =
-                left: offests.left
-                width: offests.width
-                height: offests.bottom - offests.top
+                height: height
                 top: offests.top
             $scope.container.css(css)
+            # if we get too short, we'll add the compact class
+            if height < 50
+                $scope.container.addClass('compact')
+            else
+                $scope.container.removeClass('compact')
         
+        $scope.remove = ->
+            for r,i in $scope.person.times
+                if r.start == $scope.span.start and r.end == $scope.span.end
+                    removeIndex = i
+            if removeIndex?
+                $scope.person.times.splice(removeIndex, 1)
+
+            if $scope.person.times.length == 0
+                delete $scope.$parent.people[$scope.person.name]
+            return
+
+
         # deep watch span
         $scope.$watch('span', resize, true)
-        $scope.$on 'offsetsComputed', ->
-            resize()
+        $scope.$on('offsetsComputed', resize)
+
+
 app.directive('hourspan', hourspanWidget)
 
 #

@@ -17,11 +17,14 @@ div(class="flex-row-expand")
 // we include all the neccessary templates right here!
 //
 script(type="text/ng-template" id="day-table.tmpl.html")
+    div(class="new-hourspan-hover" ng-show="showHover")
+        span(class="glyphicon glyphicon-plus")
+        |  Time Span 
     table(class="table table-fixed")
         thead
             tr
                 th(class="col-hour")
-                th(ng-repeat="person in people", x-name="{{person.name}}")="{{person.name}}"
+                th(ng-repeat="(name, person) in people", x-name="{{person.name}}")="{{person.name}}"
                     hourspan(span="span", ng-repeat="span in person.times", person="person")
                 th(class="col-new")
                     button(class="btn btn-primary")="New "
@@ -29,17 +32,20 @@ script(type="text/ng-template" id="day-table.tmpl.html")
         tbody
             tr(ng-repeat="hour in hours", class="{{hour.thisday}}", on-last-repeat)
                 td(class="col-hour hour")="{{hour.hour}}"
-                td(ng-repeat="person in people", class="hour", x-hour="{{hour.time}}")
+                td(ng-repeat="person in people", class="hour hoverable", x-hour="{{hour.time}}" x-name="{{person.name}}")
                 td(class="col-new hour")
 
 script(type="text/ng-template" id="hourspan.tmpl.html")
     div(class="hourspan-container")
         div(class="hourspan alert alert-success")
+            button(class="btn btn-default remove-button" ng-click="remove()")
+                span(class="glyphicon glyphicon-trash")
             div(class="drag-handle top")
                 div(class="drag-handle-container")
                     span(class="icon-bar")
                     span(class="icon-bar")
-            |"Hours"
+            div(class="middle")
+                | Hours
             div(class="drag-handle bottom")
                 div(class="drag-handle-container")
                     span(class="icon-bar")

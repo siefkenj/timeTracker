@@ -174,7 +174,6 @@ dataService = ($http, $q) ->
 
             oldRecord = @get(date,null,null,true)
             oldRecord.then (response) ->
-                console.log 'xx', response
                 response.data[person.name] =
                     name: person.name
                     times: [{start:10,end:11}]

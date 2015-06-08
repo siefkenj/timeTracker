@@ -3,7 +3,7 @@
 /*
  * START OF THE APP
  */
-var END_TIME, START_TIME, app, createHourList, dayController, dayTableWidget, hourspanWidget, onLastRepeat, roundToHalf,
+var END_TIME, START_TIME, app, createHourList, dayController, dayTableWidget, hourspanWidget, newpersondialog, onLastRepeat, roundToHalf,
   modulo = function(a, b) { return (+a % (b = +b) + b) % b; };
 
 app = angular.module('dayControllers', []);
@@ -23,52 +23,37 @@ dayController = function($scope, $routeParams, dataService) {
   $scope.year = $routeParams.year;
   $scope.month = $routeParams.month;
   $scope.day = $routeParams.day;
+  $scope.date = new Date($scope.year, $scope.month - 1, $scope.day);
+  $scope.getHumanReadableDate = function() {
+    var str;
+    str = $scope.date.toLocaleString('en-US', {
+      weekday: 'long',
+      month: 'long',
+      day: 'numeric'
+    });
+    return str + " (" + $scope.year + ")";
+  };
+  $scope.getURLforDay = function(offset) {
+    var date;
+    if (offset == null) {
+      offset = 0;
+    }
+    date = new Date(+$scope.year, +$scope.month - 1, +$scope.day + offset);
+    return "#/day/" + (date.getFullYear()) + "/" + (date.getMonth() + 1) + "/" + (date.getDate());
+  };
   $scope.hours = createHourList(START_TIME, END_TIME);
   updatePeople = function() {
     return dataService.get($routeParams.year, $routeParams.month, $routeParams.day).then(function(dayData) {
       return $scope.people = dayData;
     });
   };
-  $scope.people = {
-    'Andrew': {
-      name: 'Andrew',
-      times: [
-        {
-          start: 10,
-          end: 12
-        }, {
-          start: 4,
-          end: 8
-        }
-      ]
-    },
-    'Seth': {
-      name: 'Seth',
-      times: [
-        {
-          start: 4,
-          end: 8
-        }
-      ]
-    },
-    'Paul': {
-      name: 'Paul',
-      times: [
-        {
-          start: 14,
-          end: 15.5
-        }
-      ]
-    }
-  };
+  $scope.people = {};
+  updatePeople();
   $scope.possibleNames = [];
   dataService.getPossibleNames().then(function(names) {
     return $scope.possibleNames = names;
   });
   $scope.showNewPersonDialog = false;
-  $scope.newPerson = function() {
-    return $scope.showNewPersonDialog = true;
-  };
   $scope.addPerson = function(person) {
     var promise;
     promise = dataService.addPersonToDay({
@@ -92,6 +77,9 @@ dayController = function($scope, $routeParams, dataService) {
     });
   };
   $scope.$watch('people', dataChanged, true);
+  $scope.addPersonDialogShow = function() {
+    return $scope.showNewPersonDialog = true;
+  };
 };
 
 app.controller('DayController', ['$scope', '$routeParams', 'dataService', dayController]);
@@ -167,6 +155,7 @@ dayTableWidget = function() {
             tops[hour] = row.offsetTop;
           }
         }
+        $scope.offsets['_tops'] = tops;
         ref2 = $scope.people;
         for (_ in ref2) {
           person = ref2[_];
@@ -185,14 +174,20 @@ dayTableWidget = function() {
       };
       $scope.getOffsets = function(name, hourSpan) {
         var hours, interpolateTime, maxHour, minHour, offsets, ret;
-        if (!$scope.offsets[name]) {
-          ret = {
-            left: 10,
-            width: 50,
-            bottom: hourSpan.end * 20,
-            top: hourSpan.start * 20
+        offsets = $scope.offsets[name];
+        if (!offsets) {
+          offsets = {
+            tops: $scope.offsets['_tops']
           };
-          return ret;
+          if (Object.keys(offsets.tops || {}).length === 0) {
+            ret = {
+              left: 10,
+              width: 50,
+              bottom: hourSpan.end * 20,
+              top: hourSpan.start * 20
+            };
+            return ret;
+          }
         }
         interpolateTime = function(hour, values) {
           var decimal, delta, x1, x2;
@@ -208,7 +203,6 @@ dayTableWidget = function() {
           decimal = hour - x1;
           return values[x1] + decimal * delta;
         };
-        offsets = $scope.offsets[name];
         hours = Object.keys(offsets.tops);
         minHour = Math.min.apply(Math, hours);
         maxHour = Math.max.apply(Math, hours);
@@ -284,7 +278,7 @@ dayTableWidget = function() {
         person.times.push(newRange);
       };
       $scope.$on('onLastRepeat', function() {
-        console.log('last');
+        $scope.lastRepeatDone = true;
         $scope.computeOffsets();
         return $scope.$broadcast('offsetsComputed', $scope.offsets);
       });
@@ -297,6 +291,9 @@ dayTableWidget = function() {
         } else {
           $($scope.container).find('.hour[x-name]').removeClass('hoverable');
         }
+      };
+      $scope.addPerson = function() {
+        return $scope.$parent.addPersonDialogShow();
       };
       window.sss = $scope;
     }
@@ -439,6 +436,74 @@ hourspanWidget = function() {
 };
 
 app.directive('hourspan', hourspanWidget);
+
+newpersondialog = function() {
+  return {
+    templateUrl: 'newpersondialog.tmpl.html',
+    restrict: 'E',
+    scope: {
+      possibleNames: '=',
+      modalShow: '=',
+      addPerson: '='
+    },
+    link: function(scope, elm, attr) {
+      scope.container = elm;
+      scope.modal = $(elm).find('.modal');
+      scope.select = $(elm).find('input').selectize({
+        create: true,
+        createOnBlur: true
+      });
+      scope.select[0].selectize.on('change', function(value) {
+        var values;
+        values = value.split(',');
+        return scope.newNames = values;
+      });
+    },
+    controller: function($scope) {
+      $scope.newNames = [];
+      $scope.$watch('possibleNames', function() {
+        var j, len, name, ref;
+        ref = $scope.possibleNames || [];
+        for (j = 0, len = ref.length; j < len; j++) {
+          name = ref[j];
+          $scope.select[0].selectize.addOption({
+            value: name,
+            text: name
+          });
+        }
+        return $scope.select[0].selectize.refreshOptions();
+      });
+      $scope.$watch('modalShow', function() {
+        if ($scope.modalShow) {
+          return $scope.modal.modal('show');
+        } else {
+          return $scope.modal.modal('hide');
+        }
+      });
+      $scope.hide = function() {
+        return $scope.modalShow = false;
+      };
+      $scope.addPersonClick = function(nameList) {
+        var j, len, name;
+        for (j = 0, len = nameList.length; j < len; j++) {
+          name = nameList[j];
+          console.log("you want to add " + name);
+          if (typeof $scope.addPerson === "function") {
+            $scope.addPerson(name);
+          }
+        }
+        $scope.showDialog = false;
+        return $scope.select[0].selectize.clear();
+      };
+      return $scope.clickedName = function(name) {
+        $scope.addPersonClick([name]);
+        return $scope.hide();
+      };
+    }
+  };
+};
+
+app.directive('newpersondialog', newpersondialog);
 
 onLastRepeat = function() {
   return {

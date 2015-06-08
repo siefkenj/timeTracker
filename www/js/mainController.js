@@ -220,7 +220,6 @@ dataService = function($http, $q) {
       d = $q.defer();
       oldRecord = this.get(date, null, null, true);
       oldRecord.then(function(response) {
-        console.log('xx', response);
         response.data[person.name] = {
           name: person.name,
           times: [

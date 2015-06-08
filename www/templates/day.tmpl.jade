@@ -1,15 +1,16 @@
 nav(class="flex-row-non-expand")
     ul(class="pager")
         li(class="previous")
-            a(href="#")
+            a(href="{{ getURLforDay(-1) }}")
                 span(aria-hidden="true")="←"
-                | Previous
+                |  Previous
 
         li(class="next")
-            a(href="#")="Next"
+            a(href="{{ getURLforDay(1) }}")="Next "
                 span(aria-hidden="true")="→"
         div(class="btn-group" role="group")
-            button(type="button" class="btn btn-default")="{{year}} / {{month}} / {{day}}"
+            button(type="button" class="btn btn-default")="{{getHumanReadableDate()}}"
+newpersondialog(possible-names="possibleNames", modal-show="showNewPersonDialog", add-person="addPerson")
 div(class="flex-row-expand")
     div(class="day-container")
         day-table(people="people", hours="hours")
@@ -19,7 +20,7 @@ div(class="flex-row-expand")
 script(type="text/ng-template" id="day-table.tmpl.html")
     div(class="new-hourspan-hover" ng-show="showHover")
         span(class="glyphicon glyphicon-plus")
-        |  Time Span 
+        |  Time Span
     table(class="table table-fixed")
         thead
             tr
@@ -27,11 +28,11 @@ script(type="text/ng-template" id="day-table.tmpl.html")
                 th(ng-repeat="(name, person) in people", x-name="{{person.name}}")="{{person.name}}"
                     hourspan(span="span", ng-repeat="span in person.times", person="person")
                 th(class="col-new")
-                    button(class="btn btn-primary")="New "
+                    button(class="btn btn-primary" ng-click="addPerson()")="New "
                         span(class="glyphicon glyphicon-plus", aria-hidden="true")
         tbody
             tr(ng-repeat="hour in hours", class="{{hour.thisday}}", on-last-repeat)
-                td(class="col-hour hour")="{{hour.hour}}"
+                td(class="col-hour hour", x-hour="{{hour.time}}")="{{hour.hour}}"
                 td(ng-repeat="person in people", class="hour hoverable", x-hour="{{hour.time}}" x-name="{{person.name}}")
                 td(class="col-new hour")
 
@@ -44,9 +45,24 @@ script(type="text/ng-template" id="hourspan.tmpl.html")
                 div(class="drag-handle-container")
                     span(class="icon-bar")
                     span(class="icon-bar")
-            div(class="middle")
-                | Hours
+            div(class="middle")="{{span.end-span.start}} Hours"
             div(class="drag-handle bottom")
                 div(class="drag-handle-container")
                     span(class="icon-bar")
                     span(class="icon-bar")
+script(type="text/ng-template" id="newpersondialog.tmpl.html")
+    div(class="modal fade" role="dialog")
+        div(class="modal-dialog modal-lg")
+            div(class="modal-content")
+                div(class="modal-header")
+                    button(type="button", class="close", ng-click="hide()", aria-label="Close")
+                        span(aria-hidden="true")!="&times;"
+                    h4(class="modal-title")="Add a New Person"
+                div(class="modal-body")
+                    h4="Recent"
+                    button(type="button", class="btn btn-primary", ng-repeat="name in possibleNames | limitTo:5:0", ng-click="clickedName(name)")="{{name}}"
+                    h4="Add"
+                    input
+                div(class="modal-footer")
+                    button(type="button", class="btn btn-default", ng-click="hide()")="Close"
+                    button(type="button", class="btn btn-primary", ng-click="addPersonClick(newNames)" )="Add"

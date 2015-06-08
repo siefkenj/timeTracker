@@ -129,6 +129,7 @@ body {
   height: 9em;
   padding-left: 4px;
   padding-right: 4px;
+  z-index: 5;
 }
 .day-container .hourspan.alert {
   padding: 0px;
@@ -183,6 +184,7 @@ body {
   padding-left: 3px;
   cursor: default;
   position: absolute;
+  z-index: 0;
 }
 .alert .icon-bar {
   -webkit-border-radius: 0.5px;
@@ -198,11 +200,11 @@ body {
 }
 .alert .drag-handle {
   width: 100%;
-  cursor: pointer;
 }
 .alert .drag-handle.top {
   padding-top: 1px;
   padding-bottom: 10px;
+  cursor: n-resize;
 }
 .alert .drag-handle.top .drag-handle-container {
   width: 100%;
@@ -212,6 +214,7 @@ body {
 .alert .drag-handle.bottom {
   padding-bottom: 1px;
   padding-top: 10px;
+  cursor: s-resize;
 }
 .alert .drag-handle.bottom .drag-handle-container {
   width: 100%;

@@ -16,6 +16,14 @@ dayController = ($scope, $routeParams, dataService) ->
     $scope.year = $routeParams.year
     $scope.month = $routeParams.month
     $scope.day = $routeParams.day
+    $scope.date = new Date($scope.year, $scope.month-1, $scope.day)
+    $scope.getHumanReadableDate = ->
+        str = $scope.date.toLocaleString('en-US', { weekday: 'long', month: 'long', day: 'numeric'})
+        return "#{str} (#{$scope.year})"
+
+    $scope.getURLforDay = (offset=0) ->
+        date = new Date(+$scope.year, +$scope.month-1, +$scope.day + offset)
+        return "#/day/#{date.getFullYear()}/#{date.getMonth()+1}/#{date.getDate()}"
 
     $scope.hours = createHourList(START_TIME, END_TIME)
 
@@ -23,20 +31,19 @@ dayController = ($scope, $routeParams, dataService) ->
         dataService.get($routeParams.year, $routeParams.month, $routeParams.day)
         .then (dayData) ->
             $scope.people = dayData
-    #updatePeople()
-    $scope.people =
-        'Andrew': { name: 'Andrew', times: [{start:10, end:12}, {start:4, end:8}] },
-        'Seth': { name: 'Seth', times: [{start:4, end:8}] },
-        'Paul': { name: 'Paul', times: [{start:14, end:15.5}] },
-    
+    $scope.people = {}
+    updatePeople()
+    #$scope.people =
+    #    'Andrew': { name: 'Andrew', times: [{start:10, end:12}, {start:4, end:8}] },
+    #    'Seth': { name: 'Seth', times: [{start:4, end:8}] },
+    #    'Paul': { name: 'Paul', times: [{start:14, end:15.5}] },
+
 
     $scope.possibleNames = []
     dataService.getPossibleNames().then (names) ->
         $scope.possibleNames = names
 
     $scope.showNewPersonDialog = false
-    $scope.newPerson = ->
-        $scope.showNewPersonDialog = true
     $scope.addPerson = (person) ->
         promise = dataService.addPersonToDay
             year: $routeParams.year
@@ -54,6 +61,10 @@ dayController = ($scope, $routeParams, dataService) ->
             data: $scope.people
 
     $scope.$watch('people', dataChanged, true)
+
+    $scope.addPersonDialogShow = ->
+        $scope.showNewPersonDialog = true
+
 
     return
 app.controller('DayController', ['$scope', '$routeParams', 'dataService', dayController])
@@ -82,7 +93,7 @@ dayTableWidget = ->
                 name = parent.getAttribute('x-name')
                 hour = parseInt(parent.getAttribute('x-hour'), 10)
                 person = scope.people[name]
-                
+
                 scope.newTime(person, hour)
                 scope.showHover = false
                 scope.$apply()
@@ -131,6 +142,8 @@ dayTableWidget = ->
                 if row
                     tops[hour] = row.offsetTop
 
+            $scope.offsets['_tops'] = tops
+
             for _,person of $scope.people
                 col = $scope.container.find("[x-name=\"#{person.name}\"]")[0]
                 if not col?
@@ -142,15 +155,21 @@ dayTableWidget = ->
             $scope.hourHeight = tops[1] - tops[0] || $scope.hourHeight
             return $scope.offsets
         $scope.getOffsets = (name, hourSpan) ->
-            if not $scope.offsets[name]
-                # if for some reason we don't have any data on that name,
-                # return something sensible...
-                ret =
-                    left: 10
-                    width: 50
-                    bottom: hourSpan.end*20
-                    top: hourSpan.start*20
-                return ret
+            offsets = $scope.offsets[name]
+            if not offsets
+                # use generic tops if there is no info for the name
+                # _tops lacks any width info
+                offsets = {tops: $scope.offsets['_tops']}
+                if Object.keys(offsets.tops || {}).length == 0
+                    # if for some reason we don't have any data on that name,
+                    # return something sensible...
+                    ret =
+                        left: 10
+                        width: 50
+                        bottom: hourSpan.end*20
+                        top: hourSpan.start*20
+
+                    return ret
 
             # linearly interpolate values using the keys
             # of values as the xs and the value of values as
@@ -168,12 +187,11 @@ dayTableWidget = ->
                 decimal = hour - x1
                 return values[x1] + decimal*delta
 
-            offsets = $scope.offsets[name]
             hours = Object.keys(offsets.tops)
             minHour = Math.min(hours...)
             maxHour = Math.max(hours...)
-            
-            # set up the return bounds 
+
+            # set up the return bounds
             # with defaults
             ret =
                 left: offsets.left
@@ -187,14 +205,14 @@ dayTableWidget = ->
             ret.top = interpolateTime(hourSpan.start, offsets.tops) || ret.top
 
             return ret
-        
+
         # compute the largest time interval
         # a timespan can occupy centered at initTime
         # if ignoreRange is set, then that time interval
         # is treated as if it isn't there
         $scope.computeValidTimeRange = (person, initTime, ignoreRange={}) ->
             useableIntervals = (i for i in person.times when (i.start != ignoreRange.start and i.end != ignoreRange.end))
-            
+
             end = Math.min.apply(null, (i.start for i in useableIntervals when (i.start >= initTime)))
             end = Math.min(26, end)     # fix these hardcoded values
             start = Math.max.apply(null, (i.end for i in useableIntervals when (i.end <= initTime)))
@@ -208,7 +226,7 @@ dayTableWidget = ->
         # to keep the duration `defaultDuration`
         $scope.newTime = (person, hour, defaultDuration=2) ->
             range = $scope.computeValidTimeRange(person, hour)
-            # create a new range that defaults to defaultDuration hours 
+            # create a new range that defaults to defaultDuration hours
             # but is garunteed to remain in the bounds of range
             newRange =
                 start: hour
@@ -216,14 +234,23 @@ dayTableWidget = ->
             newRange.end = Math.min(newRange.end, range.end)
             newRange.start = newRange.end - defaultDuration
             newRange.start = Math.max(newRange.start, range.start)
-            
+
             person.times.push(newRange)
             return
 
         $scope.$on 'onLastRepeat', ->
-            console.log 'last'
+            $scope.lastRepeatDone = true
             $scope.computeOffsets()
             $scope.$broadcast('offsetsComputed', $scope.offsets)
+
+        # if a new person is added, they won't have any offsets
+        # unless we compute some for them
+        # XXX: since we don't use the width info anymore, this isn't
+        # completely needed...
+        #$scope.$watch 'people', ->
+        #    if $scope.lastRepeatDone
+        #        $scope.computeOffsets()
+        #        $scope.$broadcast('offsetsComputed', $scope.offsets)
 
         $scope.makeHoverable = (choice=true) ->
             if choice
@@ -231,7 +258,10 @@ dayTableWidget = ->
             else
                 $($scope.container).find('.hour[x-name]').removeClass('hoverable')
             return
-        
+
+        $scope.addPerson = ->
+            $scope.$parent.addPersonDialogShow()
+
         window.sss = $scope
         return
 app.directive('dayTable', dayTableWidget)
@@ -252,9 +282,9 @@ hourspanWidget = ->
         origTimeStart = scope.span.start
         origTimeEnd = scope.span.end
 
-        
+
         bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart+origTimeEnd)/2, {start: origTimeStart, end: origTimeEnd})
-        
+
         top = interact($(elm).find('.drag-handle.top')[0])
         top.draggable({max: Infinity})
         topDragStart = (evt) ->
@@ -262,7 +292,7 @@ hourspanWidget = ->
             origTimeStart = scope.span.start
             origTimeEnd = scope.span.end
             bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart+origTimeEnd)/2, {start: origTimeStart, end: origTimeEnd})
-            
+
             # make sure we don't accidentally trigger
             # unwanted hover events on the parent
             scope.$parent.makeHoverable(false)
@@ -296,7 +326,7 @@ hourspanWidget = ->
         top.on('dragend', topDragEnd)
         top.on('dragmove', topDragMove)
 
-        
+
         bottom = interact($(elm).find('.drag-handle.bottom')[0])
         bottom.draggable({max: Infinity})
         bottom.on 'dragstart', (evt) ->
@@ -304,7 +334,7 @@ hourspanWidget = ->
             origTimeEnd = scope.span.end
             origTimeStart = scope.span.start
             bounds = scope.$parent.computeValidTimeRange(scope.person, (origTimeStart+origTimeEnd)/2, {start: origTimeStart, end: origTimeEnd})
-            
+
             # make sure we don't accidentally trigger
             # unwanted hover events on the parent
             scope.$parent.makeHoverable(false)
@@ -342,7 +372,7 @@ hourspanWidget = ->
                 $scope.container.addClass('compact')
             else
                 $scope.container.removeClass('compact')
-        
+
         $scope.remove = ->
             for r,i in $scope.person.times
                 if r.start == $scope.span.start and r.end == $scope.span.end
@@ -361,6 +391,53 @@ hourspanWidget = ->
 
 
 app.directive('hourspan', hourspanWidget)
+
+newpersondialog = ->
+    templateUrl: 'newpersondialog.tmpl.html'
+    restrict: 'E'
+    scope:
+        possibleNames: '='
+        modalShow: '='
+        addPerson: '='
+    link: (scope, elm, attr) ->
+        scope.container = elm
+        scope.modal = $(elm).find('.modal') #.modal('show')
+
+        scope.select = $(elm).find('input').selectize({ create: true, createOnBlur: true })
+        scope.select[0].selectize.on 'change', (value) ->
+            values = value.split(',')
+            scope.newNames = values
+        return
+
+    controller: ($scope) ->
+        $scope.newNames = []
+        $scope.$watch 'possibleNames', ->
+            for name in ($scope.possibleNames || [])
+                $scope.select[0].selectize.addOption({value: name, text: name})
+            $scope.select[0].selectize.refreshOptions()
+
+        $scope.$watch 'modalShow', ->
+            if $scope.modalShow
+                $scope.modal.modal('show')
+            else
+                $scope.modal.modal('hide')
+
+        $scope.hide = ->
+            $scope.modalShow = false
+
+        $scope.addPersonClick = (nameList) ->
+            for name in nameList
+                console.log("you want to add #{name}")
+                $scope.addPerson?(name)
+            $scope.showDialog = false
+            $scope.select[0].selectize.clear()
+
+        $scope.clickedName = (name) ->
+            $scope.addPersonClick([name])
+            $scope.hide()
+
+app.directive('newpersondialog', newpersondialog)
+
 
 #
 # Directive that fires an even on the last instance of an ng-repeat

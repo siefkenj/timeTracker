@@ -30,4 +30,8 @@ nav(class="flex-row-non-expand")
                     li(ng-repeat="m in monthList")
                         a(href="#/calendar/{{yearNum}}/{{m+1}}")="{{monthToString(m)}}"
 div(class="flex-row-expand")
-    div(class="calendar-container")="the cal {{monthNum}}"
+    div(class="calendar-container")
+        table
+            tr(ng-repeat="row in displayDays")
+                td(ng-repeat="date in row")
+                    a(href="#/day/{{date.jsDate.getFullYear()}}/{{date.jsDate.getMonth()+1}}/{{date.jsDate.getDay()}}")="{{date.date}}"

@@ -22,5 +22,11 @@
   </ul>
 </nav>
 <div class="flex-row-expand">
-  <div class="calendar-container">the cal {{monthNum}}</div>
+  <div class="calendar-container">
+    <table>
+      <tr ng-repeat="row in displayDays">
+        <td ng-repeat="date in row"><a href="#/day/{{date.jsDate.getFullYear()}}/{{date.jsDate.getMonth()+1}}/{{date.jsDate.getDay()}}">{{date.date}}</a></td>
+      </tr>
+    </table>
+  </div>
 </div>

@@ -1,17 +1,1 @@
-
-<div ng-controller="Calendar" class="container">
-  <div id="month">
-    <h1 ng-click="incMonth(-1)" class="prev-month">&lt;</h1>
-    <h1 ng-click="incMonth(1)" class="next-month">&gt;</h1>
-    <h1 class="month-name">{{ monthName() }}</h1>
-  </div>
-  <table year-num="yearNum" month-num="monthNum" class="calendar-view">
-    <tr id="week{{$index + 1}}" ng-repeat="week in displayDays">
-      <td ng-repeat="day in week" ng-click="showDay(day.jsDate)" class="day">
-        <div>
-          <calendar-day-widget day="day"></calendar-day-widget>
-        </div>
-      </td>
-    </tr>
-  </table>
-</div>
+<div ng-controller="Calendar" class="container"><div id="month"><h1 ng-click="incMonth(-1)" class="prev-month">&lt;</h1><h1 ng-click="incMonth(1)" class="next-month">&gt;</h1><h1 class="month-name">{{ monthName() }}</h1></div><table year-num="yearNum" month-num="monthNum" class="calendar-view"><tr id="week{{$index + 1}}" ng-repeat="week in displayDays"><td ng-repeat="day in week" ng-click="showDay(day.jsDate)" class="day"><div><calendar-day-widget day="day"></calendar-day-widget></div></td></tr></table></div>

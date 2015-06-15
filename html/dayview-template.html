@@ -1,13 +1,1 @@
-
-<div id="container" ng-controller="TimeViewController">
-  <button ng-click="newPerson()">New Person</button>
-  <new-person-dialog ng-show="showNewPersonDialog" possible-names="possibleNames" add-person="addPerson"></new-person-dialog>
-  <div class="dayview-hours">
-    <div class="column hours">
-      <div ng-repeat="hour in hours" class="hours {{hour.thisday}}">{{hour.hour}}</div>
-    </div>
-    <div ng-repeat="(k, person) in people" class="column hours-grid">
-      <person-day-info-widget person="person" hours="hours"></person-day-info-widget>
-    </div>
-  </div>
-</div>
+<div id="container" ng-controller="TimeViewController"><button ng-click="newPerson()">New Person</button><new-person-dialog ng-show="showNewPersonDialog" possible-names="possibleNames" add-person="addPerson"></new-person-dialog><div class="dayview-hours"><div class="column hours"><div ng-repeat="hour in hours" class="hours {{hour.thisday}}">{{hour.hour}}</div></div><div ng-repeat="(k, person) in people" class="column hours-grid"><person-day-info-widget person="person" hours="hours"></person-day-info-widget></div></div></div>

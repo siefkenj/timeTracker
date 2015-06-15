@@ -11,16 +11,25 @@ var express = require('express'),
     app = express(),
     http = require('http'),
     server = http.createServer(app),
+    coffeeMiddleware = require('coffee-middleware'),
     path = require('path');
 
 //render the jade templates
-app.set('views', path.join(__dirname + '/html'));
+app.set('views', path.join(__dirname + '/www'));
 app.set('view engine', 'jade');
+
+// render coffeescript on the fly
+app.use(coffeeMiddleware({
+    dest: __dirname + '/www/js',
+    src: __dirname + '/www/js',
+    prefix: '/js',
+    compress: true
+}));
 
 // when sending the files make them compressed
 app.use(compression());
 // Statically serve pages from the public directory
-app.use(express.static(__dirname + '/html'));
+app.use(express.static(__dirname + '/www'));
 
 // now the server will by default render the jade!!!
 app.get('/', function(req, res, next){

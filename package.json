@@ -6,6 +6,7 @@
     "start": "node server.js"
   },
   "dependencies": {
+    "coffee-middleware": "^0.2.1",
     "compression": "^1.4.2",
     "express": "~4.11.1",
     "jade": "^1.9.2"

@@ -3,9 +3,6 @@
 # Watches .coffee and .jade and .styl files and comiles them
 # wheneeer they change
 
-
-coffee -r www && stylus -r www/ -u nib && jade --pretty www/
-
 WATCHABLE=(coffee jade styl)
 
 compile() {

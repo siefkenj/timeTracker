@@ -34,8 +34,6 @@ app.use(stylus.middleware({
     compile: function (str, path) { 
         return stylus(str)
             .set('filename', path)
-            .set('compress', true)
-            .set('pretty', true)
             .use(nib())
             .import('nib');
     }

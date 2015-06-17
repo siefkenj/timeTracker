@@ -9,6 +9,8 @@
     "coffee-middleware": "^0.2.1",
     "compression": "^1.4.2",
     "express": "~4.11.1",
-    "jade": "^1.9.2"
+    "jade": "^1.9.2",
+    "nib": "^1.1.0",
+    "stylus": "^0.51.1"
   }
 }

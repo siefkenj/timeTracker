@@ -28,8 +28,8 @@ nav(class="flex-row-non-expand")
                         a(href="#/calendar/{{yearNum}}/{{m+1}}")="{{monthToString(m)}}"
 div(class="flex-row-expand")
     //div(class="calendar-container")="the cal {{monthNum}}"
-    div.table-responsive.calendar
-        table.table-bordered
+    div.table-responsive
+        table.table.table-bordered
             tr(id='week{{$index + 1}}', ng-repeat='week in displayDays' )
                 td.day(ng-repeat='day in week', ng-click="showDay(day.jsDate)")
                     p(ng-repeat="person in day.data")= "{{person.name}}"

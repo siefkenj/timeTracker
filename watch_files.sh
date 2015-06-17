@@ -4,6 +4,8 @@
 # wheneeer they change
 
 
+coffee -r www && stylus -r www/ -u nib && jade --pretty www/
+
 WATCHABLE=(coffee jade styl)
 
 compile() {

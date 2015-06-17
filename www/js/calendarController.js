@@ -14,7 +14,39 @@
    * CalendarController
    */
 
+<<<<<<< HEAD
   LOCALE = "en-us";
+=======
+calendarController = function($scope, $http, $routeParams, dataService) {
+  var now;
+  now = new Date();
+  $scope.monthNum = ($routeParams.month - 1) | 0 || now.getMonth();
+  $scope.yearNum = $routeParams.year | 0 || now.getFullYear();
+  $scope.monthToString = function(m) {
+    return (new Date($scope.yearNum, m)).toLocaleDateString(LOCALE, {
+      month: 'long'
+    });
+  };
+  $scope.monthList = [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11];
+  $scope.incMonth = function(inc) {
+    return $scope.monthNum += inc;
+  };
+  $scope.monthName = function() {
+    var date, locale, nav;
+    nav = window.navigator;
+    locale = nav.language || nav.userLanguage;
+    date = new Date($scope.yearNum, $scope.monthNum, 1);
+    return date.toLocaleDateString(locale, {
+      month: 'long'
+    });
+  };
+  $scope.$watch('monthNum', function() {
+    var newDate;
+    newDate = new Date($scope.yearNum, $scope.monthNum, 1);
+    return $scope.displayDays = setupMonth(newDate, dataService);
+  });
+};
+>>>>>>> origin
 
   calendarController = function($scope, $http, $routeParams, dataService) {
     var now;

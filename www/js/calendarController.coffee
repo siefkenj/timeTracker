@@ -14,7 +14,6 @@ calendarController = ($scope, $http, $routeParams, dataService) ->
     $scope.monthNum = ($routeParams.month - 1)|0 ||  now.getMonth()
     $scope.yearNum = $routeParams.year|0 ||  now.getFullYear()
 
-    window.ss=$scope
     $scope.monthToString = (m) ->
         return (new Date($scope.yearNum, m)).toLocaleDateString(LOCALE, {month: 'long'})
     $scope.monthList = [0...12]

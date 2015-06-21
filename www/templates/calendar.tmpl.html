@@ -1,4 +1,4 @@
-   
+
 <nav class="flex-row-non-expand">
   <ul class="pager">
     <li class="previous"><a href="#/calendar/{{yearNum}}/{{monthNum}}"><span aria-hidden="true">←</span>Previous</a></li>
@@ -22,10 +22,14 @@
   </ul>
 </nav>
 <div class="flex-row-expand">
-  <div class="calendar-container">
-    <table>
-      <tr ng-repeat="row in displayDays">
-        <td ng-repeat="date in row"><a href="#/day/{{date.jsDate.getFullYear()}}/{{date.jsDate.getMonth()+1}}/{{date.jsDate.getDay()}}">{{date.date}}</a></td>
+  <!--div(class="calendar-container")="the cal {{monthNum}}"-->
+  <div class="table-responsive">
+    <table class="table table-bordered">
+      <tr id="week{{$index + 1}}" ng-repeat="week in displayDays">
+        <td ng-repeat="day in week" ng-click="showDay(day.jsDate)" class="day">
+          <p ng-repeat="person in day.data">{{person.name}}
+            <!--calendar-day-widget(day="day")--></p>
+        </td>
       </tr>
     </table>
   </div>

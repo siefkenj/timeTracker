@@ -1,12 +1,9 @@
-    
-
 nav(class="flex-row-non-expand")
     ul(class="pager")
         li(class="previous")
             a(href="#/calendar/{{yearNum}}/{{monthNum}}")
                 span(aria-hidden="true")="←"
                 | Previous
-
         li(class="next")
             a(href="#/calendar/{{yearNum}}/{{monthNum+2}}")="Next"
                 span(aria-hidden="true")="→"
@@ -30,8 +27,10 @@ nav(class="flex-row-non-expand")
                     li(ng-repeat="m in monthList")
                         a(href="#/calendar/{{yearNum}}/{{m+1}}")="{{monthToString(m)}}"
 div(class="flex-row-expand")
-    div(class="calendar-container")
-        table
-            tr(ng-repeat="row in displayDays")
-                td(ng-repeat="date in row")
-                    a(href="#/day/{{date.jsDate.getFullYear()}}/{{date.jsDate.getMonth()+1}}/{{date.jsDate.getDay()}}")="{{date.date}}"
+    //div(class="calendar-container")="the cal {{monthNum}}"
+    div.table-responsive
+        table.table.table-bordered
+            tr(id='week{{$index + 1}}', ng-repeat='week in displayDays' )
+                td.day(ng-repeat='day in week', ng-click="showDay(day.jsDate)")
+                    p(ng-repeat="person in day.data")= "{{person.name}}"
+                        //calendar-day-widget(day="day")

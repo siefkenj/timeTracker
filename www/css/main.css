@@ -224,3 +224,12 @@ body {
 .alert .drag-handle-container {
   height: 4px;
 }
+.table {
+  table-layout: fixed;
+}
+.table {
+  white-space: nowrap;
+  overflow: hidden;
+  -o-text-overflow: ellipsis;
+  text-overflow: ellipsis;
+}

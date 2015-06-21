@@ -28,6 +28,7 @@ mainController = ($scope, $routeParams, $location) ->
         $location.url("/day/#{year}/#{month}/#{day}")
         return
     return
+
 app.controller('MainController', ['$scope', '$routeParams', '$location', mainController])
 
 
@@ -61,7 +62,7 @@ dataService = ($http, $q) ->
     $http.get("js/test-hangout-data.json").success(success).error(failure)
     data = deferred.promise
 
-    # set up the forerunner DB. For now if the database is empty, 
+    # set up the forerunner DB. For now if the database is empty,
     # we fill it with test data
     dbDeferred = $q.defer()
     db = new ForerunnerDB()

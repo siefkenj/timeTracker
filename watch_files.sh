@@ -3,7 +3,6 @@
 # Watches .coffee and .jade and .styl files and comiles them
 # wheneeer they change
 
-
 WATCHABLE=(coffee jade styl)
 
 compile() {

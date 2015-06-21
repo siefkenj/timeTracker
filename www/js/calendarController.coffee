@@ -33,8 +33,7 @@ calendarController = ($scope, $http, $routeParams, dataService) ->
         # use the scopes year and month as the month will vary
         newDate = new Date $scope.yearNum, $scope.monthNum, 1
         # display days is an array of objects representing the calendar data
-        
-        $scope.displayDays = setupMonth(newDate, dataService)
+        $scope.displayDays = setupMonth newDate, dataService
     return
 
 setupMonth = (displayMonth, dataService) ->
@@ -56,7 +55,7 @@ setupMonth = (displayMonth, dataService) ->
     firstDay = displayMonth.getDay()
 
     # make and array for the days of last month that are to be displayed
-    # i.e if this month starts on tuesday, find the dates of sunday and 
+    # i.e if this month starts on tuesday, find the dates of sunday and
     # monday of last month
     lastMonth = (getDate(new Date year, month, -x) for x in [0 ... firstDay]).reverse()
 
@@ -65,9 +64,9 @@ setupMonth = (displayMonth, dataService) ->
     numDays = (new Date year, month+1, 0).getDate()
     thisMonth = (getDate(new Date year, month, x) for x in [1 ... numDays ])
 
-    # find the number of days from the end of the current month 
+    # find the number of days from the end of the current month
     # to the end of the calendar week
-    # i.e. this month ends on a thursday so there are 2 days remaining 
+    # i.e. this month ends on a thursday so there are 2 days remaining
     remainingDays = 7 - (new Date year, month+1, 0).getDay()
     nextMonth = (getDate(new Date year, month+1, x+1 ) for x in [0 ... remainingDays ])
 
@@ -76,7 +75,7 @@ setupMonth = (displayMonth, dataService) ->
 
     result = []
     week = []
-    # build and array of 7 element arrays representing 
+    # build and array of 7 element arrays representing
     for day, index in displayDays
         week.push(day)
         if !((index+1) % 7)

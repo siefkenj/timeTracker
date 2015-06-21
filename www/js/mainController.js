@@ -5,7 +5,7 @@
  */
 var app, dataService, mainController, populateDatabase;
 
-app = angular.module('App', ['ngRoute', 'calendarControllers', 'dayControllers']);
+app = angular.module('App', ['ngRoute', 'calendarControllers', 'dayControllers', 'statsControllers']);
 
 app.config([
   '$routeProvider', function($routeProvider) {
@@ -21,6 +21,9 @@ app.config([
     }).when('/day/:year/:month/:day', {
       templateUrl: 'templates/day.tmpl.html',
       controller: 'DayController'
+    }).when('/statistics', {
+      templateUrl: 'templates/statistics.tmpl.html',
+      controller: 'StatsController'
     }).otherwise({
       redirectTo: '/calendar'
     });

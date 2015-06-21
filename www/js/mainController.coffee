@@ -2,7 +2,7 @@
 # START OF THE APP
 ###
 
-app = angular.module('App', ['ngRoute', 'calendarControllers', 'dayControllers'])
+app = angular.module('App', ['ngRoute', 'calendarControllers', 'dayControllers', 'statsControllers'])
 
 app.config(['$routeProvider',
     ($routeProvider) ->
@@ -10,6 +10,7 @@ app.config(['$routeProvider',
             .when('/calendar/:year/:month', {templateUrl: 'templates/calendar.tmpl.html', controller: 'CalendarController'})
             .when('/day', {templateUrl: 'templates/day.tmpl.html', controller: 'DayController'})
             .when('/day/:year/:month/:day', {templateUrl: 'templates/day.tmpl.html', controller: 'DayController'})
+            .when('/statistics', {templateUrl: 'templates/statistics.tmpl.html', controller: 'StatsController'})
             .otherwise({redirectTo: '/calendar'})
     ])
 ###
